@@ -111,7 +111,7 @@ This Python script is designed to help administrators monitor the **expiration o
 
 ## Author
 
-Created by **[Your Name]**. This script is intended for use by system administrators to simplify the monitoring of SSL and domain expiration on Webmin-managed servers.
+Created by **Dr. Peter O'Hara-Diaz**. This script is intended for use by system administrators to simplify the monitoring of SSL and domain expiration on Webmin-managed servers.
 
 ## License
 
@@ -124,17 +124,3 @@ Feel free to fork the repository, open issues, or submit pull requests to improv
 ## Disclaimer
 
 This script is provided as-is without any guarantees or warranties. Use it at your own risk and ensure it meets your requirements before using it in a production environment.
-```
-
-### Key Sections of the README
-
-- **Overview**: Describes what the script does.
-- **Features**: Lists the main benefits and functionalities.
-- **How It Works**: Explains how the script performs various tasks.
-- **Requirements**: Lists dependencies.
-- **Installation and Configuration**: Guides the user on setting up and using the script.
-- **Troubleshooting**: Provides solutions for common issues.
-- **Author**: Acknowledges your creation.
-- **License and Contributions**: Clarifies usage rights and invites contributions.
-
-Feel free to personalize the content to better reflect your work and specific repository requirements!
