@@ -24,6 +24,40 @@ This Python script is designed to help administrators monitor the **expiration o
 
 ## How It Works
 
+**MAIN EXECUTION FLOW:**
+
+Fetches domains from each Webmin server, removes duplicates, and updates the domain file.
+Reads the updated domain list from the file and checks SSL and domain expiration for each domain.
+
+1. **Imports Necessary Modules:**
+
+Imports several Python modules required for network interaction (requests), subprocesses (subprocess), logging (logging), file operations (os), and date-time calculations (datetime).
+
+2. **Configurations:**
+
+Configures a list of Webmin servers ('webmin_servers'), along with their credentials ('webmin_users' and 'webmin_passwords').
+Sets parameters for SSL certificate ('SSL_ALERT_DAYS') and domain registration ('DOMAIN_EXPIRATION_ALERT_DAYS') expiry notifications.
+
+3. **Logging Setup:**
+
+Configures a logger that writes messages to a log file ('webmin_domains.log') with rotating capabilities to avoid excessive growth of log files.
+
+4. ** Maintain Master List of Domains (Across Multiple Webmin Hosts):**
+
+Uses Webmin API to fetch the list of domains for each configured Webmin server.
+Errors during this process are logged.
+Updates a text file ('domains.txt') containing the list of domains fetched from the Webmin servers.
+
+5. **Check SSL Expiration:**
+
+Uses 'openssl' to check the SSL certificate of each domain and calculates the days remaining until expiry.
+Logs a warning if the SSL certificate will expire soon (<= 'SSL_ALERT_DAYS' days).
+
+6. **Check Domain Registration Expiration:**
+
+Uses the 'whois' command to check the domain registration expiry date.
+Logs a warning if the domain registration will expire soon (<= 'DOMAIN_EXPIRATION_ALERT_DAYS' days).
+
 1. **Fetches Domains from Webmin API**:
    - Connects to specified Webmin servers using the API and retrieves the list of managed domains.
    
@@ -44,37 +78,36 @@ This Python script is designed to help administrators monitor the **expiration o
 +-------------------------------------------+
 |        Webmin Domain & SSL Monitor        |
 +-------------------------------------------+
-                |
-                v
+
 +-------------------------------------------+
 |  1) Fetch Domain List from Webmin API     |
 |     - Connect to Webmin servers           |
 |     - Retrieve domain list                |
 +-------------------------------------------+
-                |
-                v
+                     |
+                     v
 +-------------------------------------------+
 |  2) Update Local Domain File (domains.txt)|
 |     - Add new domains                     |
 |     - Remove deleted domains              |
 +-------------------------------------------+
-                |
-                v
+                     |
+                     v
 +-------------------------------------------+
 |  3) Check SSL Certificate Expiration      |
 |     - Use OpenSSL to check expiration     |
 |     - Alert if SSL expires within 15 days |
 +-------------------------------------------+
-                |
-                v
+                     |
+                     v
 +-------------------------------------------+
 |  4) Check Domain Registration Expiration  |
 |     - Use WHOIS to check expiration       |
 |     - Alert if domain expires within 45   |
 |       days                                |
 +-------------------------------------------+
-                |
-                v
+                     |
+                     v
 +-------------------------------------------+
 |  5) Log Results                           |
 |     - Log warnings and errors to file     |
