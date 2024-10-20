@@ -58,23 +58,6 @@ Logs a warning if the SSL certificate will expire soon (<= `SSL_ALERT_DAYS` days
 
 Uses the `whois` command to check the domain registration expiry date.
 Logs a warning if the domain registration will expire soon (<= `DOMAIN_EXPIRATION_ALERT_DAYS` days).
-
-1. **Fetches Domains from Webmin API**:
-   - Connects to specified Webmin servers using the API and retrieves the list of managed domains.
-   
-2. **Updates Local Domain File (`domains.txt`)**:
-   - Compares the fetched domain list with the existing local file and updates it by adding new domains and removing deleted ones.
-
-3. **Checks SSL Certificate Expiration**:
-   - Uses OpenSSL to check the expiration date of each domain`s SSL certificate.
-   - Logs a warning if the SSL certificate expires within a specified number of days (default: 15 days).
-
-4. **Checks Domain Registration Expiration**:
-   - Uses the `whois` utility to determine the domain registration expiration date.
-   - Logs a warning if the domain registration expires within a specified number of days (default: 45 days).
-
-5. **Logging and Error Handling**:
-   - All events and errors are logged in a rotating log file (`webmin_domains.log`) for easy monitoring and troubleshooting.
   
 +-------------------------------------------+
 |        Webmin Domain & SSL Monitor        |
