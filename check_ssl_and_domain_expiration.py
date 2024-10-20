@@ -1,5 +1,3 @@
-# Webmin Domain and SSL Monitoring Script with Jinja2, Improved API Error Handling, and Persistent Error Alerts
-
 from dotenv import load_dotenv
 import os
 import logging
@@ -13,7 +11,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from tenacity import retry, stop_after_attempt, wait_exponential
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader, select_autoescape, TemplateNotFound
 from requests.exceptions import HTTPError, Timeout, RequestException
 import sys
 import time
@@ -67,6 +65,64 @@ EMAIL_TEMPLATE_PLAIN = os.getenv('EMAIL_TEMPLATE_PLAIN', 'email_plain.j2')
 # Continuous loop configuration
 CHECK_INTERVAL = int(os.getenv('CHECK_INTERVAL', 86400))  # Default: 24 hours
 
+# Default HTML email template
+DEFAULT_HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subject }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .content { margin-bottom: 20px; }
+        .footer { text-align: center; font-size: 12px; color: #888; margin-top: 30px; }
+        .btn { background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; }
+        .btn:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://example.com/logo.png" alt="Webmin Monitor Logo" width="100">
+            <h2>{{ subject }}</h2>
+        </div>
+        <div class="content">
+            <p><strong>Domain:</strong> {{ domain }}</p>
+            <p><strong>Expiration Type:</strong> {{ expiration_type }}</p>
+            <p><strong>Days Until Expiry:</strong> {{ days_until_expire }}</p>
+            <p>Please take the necessary actions to renew the domain or SSL certificate to avoid service disruptions.</p>
+            <a href="https://example.com/support" class="btn">Support</a>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 Dr. Peter O'Hara-Diaz. All rights reserved.</p>
+            <p>This email was generated using the default template. You can customize it by following the instructions in the <a href="https://github.com/ripcdoc/virtualmin-domains-expiry-monitor/blob/main/README.md">README</a>.</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+# Default plaintext email template
+DEFAULT_PLAIN_TEMPLATE = """
+Subject: {{ subject }}
+
+Domain: {{ domain }}
+Expiration Type: {{ expiration_type }}
+Days Until Expiry: {{ days_until_expire }}
+
+Please take the necessary actions to renew the domain or SSL certificate to avoid service disruptions.
+
+For assistance, visit our support page: https://example.com/support
+
+© 2024 Dr. Peter O'Hara-Diaz. All rights reserved.
+
+This email was generated using the default template. You can customize it by following the instructions in the README: 
+https://github.com/ripcdoc/virtualmin-domains-expiry-monitor/blob/main/README.md
+"""
+
 # Configure logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -89,29 +145,16 @@ template_env = Environment(
 
 # Custom error classes
 class WebminAuthError(Exception):
-    """Custom exception for Webmin authentication errors (e.g., 401 Unauthorized)."""
     pass
 
 class WebminServerError(Exception):
-    """Custom exception for Webmin server errors (e.g., 500 Internal Server Errors)."""
     pass
 
 class WebminConnectionError(Exception):
-    """Custom exception for Webmin connection errors (e.g., timeouts, request errors)."""
     pass
 
 @retry(stop=stop_after_attempt(MAX_RETRIES), wait=wait_exponential(multiplier=1, min=RETRY_WAIT, max=10))
 def get_domains(webmin_url, api_key):
-    """
-    Fetches domains from a Webmin server using the API key, with improved error handling.
-
-    Parameters:
-    - webmin_url (str): The URL of the Webmin server.
-    - api_key (str): The API key for authentication.
-
-    Returns:
-    - list: A list of domains retrieved from the Webmin server.
-    """
     headers = {
         'Authorization': f"Bearer {api_key}",
         'Accept': 'application/json'
@@ -130,16 +173,11 @@ def get_domains(webmin_url, api_key):
         if not response.text:
             logger.warning(f"No domains found in the response from {webmin_url}.")
             return []
-        
-        try:
-            domains = response.text.splitlines()
-            if not domains:
-                logger.warning(f"Empty domain list received from {webmin_url}.")
-            return domains
 
-        except Exception as e:
-            logger.error(f"Error parsing domain list from {webmin_url}: {e}")
-            return []
+        domains = response.text.splitlines()
+        if not domains:
+            logger.warning(f"Empty domain list received from {webmin_url}.")
+        return domains
 
     except HTTPError as http_err:
         if response.status_code == 401:
@@ -169,31 +207,31 @@ def get_domains(webmin_url, api_key):
     return []
 
 def send_persistent_error_alert(webmin_url, error_type, error_message):
-    """
-    Sends an email alert for persistent errors.
-
-    Parameters:
-    - webmin_url (str): The Webmin server URL.
-    - error_type (str): The type of error (e.g., "Unauthorized Access").
-    - error_message (str): The detailed error message.
-    """
     subject = f"Persistent Error Alert: {error_type} on {webmin_url}"
 
-    html_template = template_env.get_template(EMAIL_TEMPLATE_HTML)
-    html_content = html_template.render(
-        subject=subject,
-        domain=webmin_url,
-        expiration_type=error_type,
-        days_until_expire="N/A"
-    )
+    try:
+        html_template = template_env.get_template(EMAIL_TEMPLATE_HTML)
+        html_content = html_template.render(
+            subject=subject,
+            domain=webmin_url,
+            expiration_type=error_type,
+            days_until_expire="N/A"
+        )
+    except TemplateNotFound:
+        logger.error(f"HTML template '{EMAIL_TEMPLATE_HTML}' not found. Using default template.")
+        html_content = DEFAULT_HTML_TEMPLATE
 
-    plain_template = template_env.get_template(EMAIL_TEMPLATE_PLAIN)
-    plain_content = plain_template.render(
-        subject=subject,
-        domain=webmin_url,
-        expiration_type=error_type,
-        days_until_expire="N/A"
-    )
+    try:
+        plain_template = template_env.get_template(EMAIL_TEMPLATE_PLAIN)
+        plain_content = plain_template.render(
+            subject=subject,
+            domain=webmin_url,
+            expiration_type=error_type,
+            days_until_expire="N/A"
+        )
+    except TemplateNotFound:
+        logger.error(f"Plaintext template '{EMAIL_TEMPLATE_PLAIN}' not found. Using default template.")
+        plain_content = DEFAULT_PLAIN_TEMPLATE
 
     try:
         msg = MIMEMultipart("alternative")
@@ -213,42 +251,36 @@ def send_persistent_error_alert(webmin_url, error_type, error_message):
         logger.error(f"Error sending persistent error alert: {e}")
 
 def update_domains_file(domains):
-    """
-    Updates the domains.txt file with the provided list of domains.
-
-    Parameters:
-    - domains (list): A list of domains to write to the file.
-    """
     with open(DOMAIN_FILE, "w") as f:
         for domain in domains:
             f.write(f"{domain}\n")
 
 def send_email(domain, expiration_type, days_until_expire):
-    """
-    Sends an email alert using Jinja2 templates.
-
-    Parameters:
-    - domain (str): The domain name.
-    - expiration_type (str): The type of expiration (e.g., "SSL", "domain registration").
-    - days_until_expire (int): Number of days left until expiration.
-    """
     subject = f"{expiration_type.capitalize()} Expiration Alert: {domain}"
 
-    html_template = template_env.get_template(EMAIL_TEMPLATE_HTML)
-    html_content = html_template.render(
-        subject=subject,
-        domain=domain,
-        expiration_type=expiration_type,
-        days_until_expire=days_until_expire
-    )
+    try:
+        html_template = template_env.get_template(EMAIL_TEMPLATE_HTML)
+        html_content = html_template.render(
+            subject=subject,
+            domain=domain,
+            expiration_type=expiration_type,
+            days_until_expire=days_until_expire
+        )
+    except TemplateNotFound:
+        logger.error(f"HTML template '{EMAIL_TEMPLATE_HTML}' not found. Using default template.")
+        html_content = DEFAULT_HTML_TEMPLATE
 
-    plain_template = template_env.get_template(EMAIL_TEMPLATE_PLAIN)
-    plain_content = plain_template.render(
-        subject=subject,
-        domain=domain,
-        expiration_type=expiration_type,
-        days_until_expire=days_until_expire
-    )
+    try:
+        plain_template = template_env.get_template(EMAIL_TEMPLATE_PLAIN)
+        plain_content = plain_template.render(
+            subject=subject,
+            domain=domain,
+            expiration_type=expiration_type,
+            days_until_expire=days_until_expire
+        )
+    except TemplateNotFound:
+        logger.error(f"Plaintext template '{EMAIL_TEMPLATE_PLAIN}' not found. Using default template.")
+        plain_content = DEFAULT_PLAIN_TEMPLATE
 
     try:
         msg = MIMEMultipart("alternative")
@@ -268,15 +300,8 @@ def send_email(domain, expiration_type, days_until_expire):
         logger.error(f"Error sending email: {e}")
 
 def main():
-    """
-    Main function to execute the monitoring tasks.
-
-    - Fetches domains from the configured Webmin servers.
-    - Updates the local domain list.
-    """
     all_domains = []
 
-    # Fetch domains from each Webmin server using corresponding API key
     for i, webmin_url in enumerate(webmin_servers):
         try:
             domains = get_domains(webmin_url, webmin_api_keys[i])
@@ -291,20 +316,16 @@ def main():
         except Exception as e:
             logger.error(f"Unexpected error for {webmin_url}: {e}")
 
-    # Remove duplicates and update the local domain file
     all_domains = list(set(all_domains))
     update_domains_file(all_domains)
 
 # Uncomment the following lines to enable continuous loop mode
 # def continuous_loop():
-#     """
-#     Runs the monitoring tasks in a continuous loop with a delay between runs.
-#     """
 #     while True:
 #         main()
 #         logger.info(f"Sleeping for {CHECK_INTERVAL} seconds before the next run.")
 #         time.sleep(CHECK_INTERVAL)
 
 if __name__ == "__main__":
-    main()  # Default single-run mode (comment this line out and uncomment the line below to enable continuous loop mode)
-    # continuous_loop()
+    main()  # Default single-run mode (comment this line out if enabling continuous loop mode above)
+    # continuous_loop() # Uncomment this line if enabling continuous loop mode above)
