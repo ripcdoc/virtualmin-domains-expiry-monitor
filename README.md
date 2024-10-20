@@ -207,6 +207,8 @@ To enable continuous execution, follow these steps:
   3. Uncomment the `continuous_loop()` line and comment out the `main()` line then uncomment the continuous loop block to switch to continuous mode (clear instructions are included in the script as to what should be uncommented and what to comment out).
   4. The script will now run continuously, checking for domain and SSL expiration every `CHECK_INTERVAL` seconds.
 
+> Tip: To test the continuous loop, set a short CHECK_INTERVAL in the .env file (e.g., 60 seconds) to observe how the loop operates in real-time.
+
 #### To run as a Systemd Service in Continuous Loop Mode
 
 To set up the script as a systemd service for continuous execution:
@@ -353,12 +355,43 @@ Here’s an example of modifying the HTML template to include a custom message:
 
 Ensure that your template files are stored in the directory specified by the `TEMPLATE_DIR` environment variable. By default, the script will look for templates in `./templates`, but you can change this path in the `.env` file to point to a different location.
 
-### Troubleshooting
+### General Troubleshooting
 
 If the script fails to load a template or sends an incomplete email:
 - **Check the template file path**: Ensure that `TEMPLATE_DIR` points to the correct directory.
 - **Verify template syntax**: Ensure that the Jinja2 syntax in the templates is valid and matches the variable names passed by the script.
 - **Review logs**: Check the `webmin_domains.log` file for errors related to template rendering or email sending.
+
+### Troubleshooting Specific Issues
+
+If you encounter issues while running the script, refer to the following common problems and solutions:
+1. **Webmin API Connectivity Issues**
+   - **Error Message:** "Unauthorized access" or "Failed to connect to Webmin server".
+   - **Solution:** 
+     - Ensure that the Webmin API keys in your `.env` file are correct and match the Webmin servers listed.
+     - Double-check the Webmin server URLs for typos.
+     - Verify that API access is enabled in your Webmin settings.
+     - If connecting over HTTPS, ensure SSL verification is correctly set up.
+
+2. **Email Sending Errors**
+   - **Error Message:** "Failed to send email alert" or "SMTP authentication error".
+   - **Solution:** 
+     - Confirm that your SMTP settings (host, port, user, and password) in the `.env` file are correct.
+     - If using Gmail, ensure "Less secure app access" is enabled or use an app-specific password.
+     - Check the SMTP server logs for more detailed error information.
+
+3. **Template Not Found**
+   - **Error Message:** "HTML template not found. Using default template."
+   - **Solution:** 
+     - Ensure that your templates are located in the directory specified by `TEMPLATE_DIR` in your `.env` file.
+     - Check the file names and ensure they match what is specified in the `.env` file.
+     - If you wish to use a different template, modify the `.env` file to specify the correct template names.
+
+4. **Persistent Error Alerts**
+   - **Issue:** Receiving too many persistent error alerts for the same issue.
+   - **Solution:** 
+     - Adjust the `ERROR_ALERT_THRESHOLD` and `ERROR_ALERT_INTERVAL` values in the `.env` file to manage how frequently alerts are sent.
+     - Review the logs (`webmin_domains.log`) to identify the root cause of the persistent errors and address the underlying problem.
 
 ## Additional Information
 
