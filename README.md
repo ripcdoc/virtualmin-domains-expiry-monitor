@@ -120,6 +120,17 @@ The script will:
 - If any required variable is missing, the script will log an error and exit.
 - Ensure that `whois` and `openssl` tools are installed and accessible in your system's PATH.
 
+## Setting Up Dependencies
+
+Make sure to install all required Python packages by running the following command after cloning the repository:
+```bash
+pip install -r requirements.txt
+```
+This will install:
+- `requests`: For making HTTP requests to the Webmin API.
+- `python-dotenv`: For loading environment variables from the `.env` file.
+- `whois`: Required for performing WHOIS lookups.
+
 ## Error Handling
 
 - The script includes checks for missing environment variables and will log an error and stop execution if any are missing.
