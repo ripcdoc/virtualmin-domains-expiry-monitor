@@ -75,20 +75,43 @@ CHECK_INTERVAL=86400  # Default: 24 hours
 
 ## Running the Script
 
+### Single-Run Mode
+
+By default, the script runs once and then exits.
+
 To run the script, use the following command:
 
 ```bash
 python monitor_domains.py
 ```
 
-The script will run once and exit by default (single-run mode).
+The script will run once and exit by default.
 
-### Continuous Execution
+#### To run as a Cron Job daily/weekly/etc. in Single-Run Mode
 
-The script can be run in two modes: **single-run** or **continuous loop**.
+To run the script periodically in single-run mode, you can set up a cron job:
 
-- **Single-Run Mode**: By default, the script runs once and then exits.
-- **Continuous Loop Mode**: To enable continuous execution, follow these steps:
+1. **Open the crontab editor**:
+   ```bash
+   crontab -e
+   ```
+
+2. **Add a cron job entry**:
+   - To run the script daily at 2 AM, add the following line:
+     ```bash
+     0 2 * * * /usr/bin/python3 /path/to/your/script/monitor_domains.py >> /path/to/your/log/webmin_domains.log 2>&1
+     ```
+   - Replace `/usr/bin/python3` with the path to your Python interpreter.
+   - Replace `/path/to/your/script/` with the path to the script directory.
+   - Replace `/path/to/your/log/` with the path to the log directory.
+
+3. **Save and exit the crontab editor**.
+
+The script will now run automatically at the specified time, logging the output to the specified log file.
+
+### Continuous Loop Mode
+
+To enable continuous execution, follow these steps:
   1. Open the script file in a text editor.
   2. Locate the following lines near the end of the script:
      ```python
@@ -99,7 +122,7 @@ The script can be run in two modes: **single-run** or **continuous loop**.
   3. Uncomment the `continuous_loop()` line and comment out the `main()` line to switch to continuous mode.
   4. The script will now run continuously, checking for domain and SSL expiration every `CHECK_INTERVAL` seconds.
 
-#### Running as a Systemd Service
+#### To run as a Systemd Service in Continuous Loop Mode
 
 To set up the script as a systemd service for continuous execution:
 
@@ -143,28 +166,6 @@ To set up the script as a systemd service for continuous execution:
    ```
 
 The script will now run as a continuous service, restarting automatically if it fails and running indefinitely.
-
-### Running as a Cron Job
-
-To run the script periodically in single-run mode, you can set up a cron job:
-
-1. **Open the crontab editor**:
-   ```bash
-   crontab -e
-   ```
-
-2. **Add a cron job entry**:
-   - To run the script daily at 2 AM, add the following line:
-     ```bash
-     0 2 * * * /usr/bin/python3 /path/to/your/script/monitor_domains.py >> /path/to/your/log/webmin_domains.log 2>&1
-     ```
-   - Replace `/usr/bin/python3` with the path to your Python interpreter.
-   - Replace `/path/to/your/script/` with the path to the script directory.
-   - Replace `/path/to/your/log/` with the path to the log directory.
-
-3. **Save and exit the crontab editor**.
-
-The script will now run automatically at the specified time, logging the output to the specified log file.
 
 ## Improved Error Handling
 
