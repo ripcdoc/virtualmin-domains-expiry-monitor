@@ -1,213 +1,174 @@
 # Webmin Domain and SSL Monitoring Script
 
-![Webmin Monitor Logo](./expiry-monitor-logo.webp)
+![Expiry Monitor Logo](expiry-monitor-logo.webp)
 
 ## Overview
 
-This Python script is designed to help administrators monitor the expiration of SSL certificates and domain registrations for domains managed by Webmin/Virtualmin servers. The script interacts with the Webmin API, fetches the list of domains, checks their SSL and domain registration expiration dates, and logs warnings if they are close to expiry. It also updates a local file (`domains.txt`) to keep track of current domains and logs any changes.
+This Python script monitors SSL certificate expirations and domain registration expirations for domains managed by Webmin/Virtualmin servers. It uses the Webmin API to automatically fetch domain lists and check for SSL and domain registration expirations. The script also sends email alerts to notify administrators when domains or SSL certificates are approaching their expiration dates.
 
 ## Features
 
-- **Fetch Domain List from Webmin API**: Automatically retrieves the list of domains from one or more Webmin servers using the Webmin API.
-- **SSL Certificate Expiration Check**: Checks the SSL certificate expiration date for each domain and logs a warning if the certificate is within a configurable number of days (default is 15 days).
-- **Domain Registration Expiration Check**: Verifies the domain registration expiration and logs a warning if the registration is within a configurable number of days (default is 45 days).
-- **Automatic Domain Management**: Updates the local domain file (`domains.txt`) by adding new domains and removing deleted ones.
-- **Email Notifications**: Sends email notifications to configured recipients if SSL certificates or domains are about to expire.
-- **Configurable**: Uses environment variables for easy customization.
-- **Logging**: Logs all events, including SSL and domain checks, additions, and removals, as well as any errors encountered during execution.
+- **Domain List Fetching from Webmin API**: Automatically retrieves domain lists from Webmin servers using their respective API keys.
+- **SSL Certificate Expiration Monitoring**: Checks SSL certificates for expiration and sends alerts when they are close to expiring.
+- **Domain Registration Expiration Monitoring**: Tracks domain registration expiration dates and sends notifications when they approach expiration.
+- **Email Alerts**: Sends alerts to specified email recipients regarding SSL and domain registration expirations.
+- **Rotating Log File**: All actions, including successful checks and errors, are logged in a rotating log file.
+- **Configurable Configuration**: Uses environment variables for easy customization.
+- **Automated Execution**: Supports scheduling via cron job for regular checks.
 
 ## Why Use This Script?
 
-- **Proactive Monitoring**: Get alerted well in advance of SSL or domain expiration to prevent downtime, security risks, or unexpected loss of domain ownership.
-- **Automated Updates**: Save time by automatically syncing the domain list from Webmin, removing the need for manual domain management.
-- **Flexible and Extendable**: The Python script is written in a modular way, making it easy to customize for specific needs or to add additional features.
-- **Simple to Use**: With basic Python knowledge, users can easily set up and run this script, making it a valuable tool for administrators managing Webmin servers.
+- **Proactive Monitoring**: Be alerted in advance to prevent downtime, security risks, or unexpected loss of domain ownership.
+- **Centralized Management**: Allows administrators to manage multiple Webmin servers from a single script.
+- **Automated Updates**: Reduces manual oversight by automatically updating and tracking domains.
+- **Simple Configuration**: Easy-to-set-up environment variables make it flexible and adaptable to various use cases.
 
 ## Prerequisites
 
-Before using the script, make sure you have the following prerequisites:
+Ensure you have the following prerequisites installed:
 
-1. **Python 3.6+**: Ensure Python is installed on your machine. You can check this by running:
-   ```bash
-   python --version
-   ```
-2. **pip**: Python's package installer. You can install it by following the [official guide](https://pip.pypa.io/en/stable/installation/).
-3. **WHOIS Tool**: This script relies on the `whois` command line utility to check domain registrations. Make sure it is installed on your system.
-   - **Ubuntu/Debian**:
-     ```bash
-     sudo apt-get install whois
-     ```
-   - **CentOS/RHEL**:
-     ```bash
-     sudo yum install whois
-     ```
-4. **OpenSSL**: Required for checking SSL certificates.
-   - **Ubuntu/Debian**:
-     ```bash
-     sudo apt-get install openssl
-     ```
-   - **CentOS/RHEL**:
-     ```bash
-     sudo yum install openssl
-     ```
-5. **SMTP Access**: Ensure that SMTP credentials are available to allow the script to send email alerts.
+1. **Python 3.6+**
+   - Check Python version: `python --version`
+
+2. **pip**: Python's package manager.
+   - Install pip if not already installed.
+
+3. **WHOIS Tool**: Used for domain registration checks.
+   - Install WHOIS:
+     - Ubuntu/Debian: `sudo apt-get install whois`
+     - CentOS/RHEL: `sudo yum install whois`
+
+4. **OpenSSL**: Used for checking SSL certificates.
+   - Install OpenSSL:
+     - Ubuntu/Debian: `sudo apt-get install openssl`
+     - CentOS/RHEL: `sudo yum install openssl`
+
+5. **SMTP Access**: SMTP credentials for sending email alerts.
 
 ## Dependencies
 
-This script requires several Python packages to function correctly. All the necessary packages are listed in the `requirements.txt` file included in this repository. Before proceeding with the installation, ensure you have Python and `pip` installed on your system.
-
-To install the dependencies, run:
+Install required Python packages using the `requirements.txt` file:
 
 ```bash
 pip install -r requirements.txt
 ```
-
-This command will install all required packages specified in the `requirements.txt` file, ensuring the script operates as intended.
 
 ## Installation
 
-1. Clone the repository or download the script to your local machine.
-   ```bash
-   git clone https://github.com/ripcdoc/virtualmin-domains-expiry-monitor.git
-   cd virtualmin-domains-expiry-monitor
-   ```
-2. Install required Python packages using the `requirements.txt` file.
-   ```bash
-   pip install -r requirements.txt
-   ```
+1. **Clone the repository:**
 
-## Environment Configuration
+    ```bash
+    git clone https://github.com/ripcdoc/virtualmin-domains-expiry-monitor.git
+    cd virtualmin-domains-expiry-monitor
+    ```
 
-The script relies on environment variables for configuration. You need to create a `.env` file in the same directory as the script with the following variables:
+2. **Install dependencies:**
 
-### `.env` File Example
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3. **Set up the `.env` file:**
+
+    Create a `.env` file in the root directory using the template provided below.
+
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file with the following variables:
+
 ```env
-# Webmin Configuration
-WEBMIN_SERVERS=http://server1:10000,http://server2:10000
-WEBMIN_USERS=username1,username2
-WEBMIN_PASSWORDS=password1,password2
-
-# SSL and Domain Expiration Configuration
+WEBMIN_SERVERS=https://webmin1.example.com,https://webmin2.example.com,https://webmin3.example.com
+WEBMIN_API_KEYS=api_key1,api_key2,api_key3
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_USER=email@example.com
+EMAIL_PASSWORD=your-email-password
+EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com
 DOMAIN_FILE=domains.txt
 SSL_ALERT_DAYS=15
 DOMAIN_EXPIRATION_ALERT_DAYS=45
-
-# Logging Configuration
+MAX_RETRIES=3
+RETRY_WAIT=5
 LOG_FILE=webmin_domains.log
-
-# Email Configuration
-EMAIL_HOST=smtp.example.com
-EMAIL_PORT=587
-EMAIL_USER=your-email@example.com
-EMAIL_PASSWORD=your-email-password
-EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com
-EMAIL_SUBJECT_ssl_expiration=SSL Certificate Expiration Alert for {domain}
-EMAIL_MESSAGE_ssl_expiration=The SSL certificate for domain {domain} will expire soon. Please take action.
-EMAIL_SUBJECT_domain_expiration=Domain Registration Expiration Alert for {domain}
-EMAIL_MESSAGE_domain_expiration=The domain {domain} will expire soon. Please renew it.
 ```
 
-- **WEBMIN_SERVERS**: URLs of Webmin servers to monitor.
-- **WEBMIN_USERS**: Corresponding usernames for Webmin servers.
-- **WEBMIN_PASSWORDS**: Corresponding passwords for Webmin servers.
-- **SSL_ALERT_DAYS**: Number of days before SSL expiration to trigger an alert.
-- **DOMAIN_EXPIRATION_ALERT_DAYS**: Number of days before domain registration expiration to trigger an alert.
-- **LOG_FILE**: File path for logging outputs.
-- **Email Configuration**: SMTP settings and email templates for alerts.
+### Setting Up Webmin API Users and API Keys
 
-## Usage
+1. **Log in to each Webmin server:**
+   - Access the Webmin dashboard at `https://<your-server-ip>:10000/` and log in.
 
-To run the script, use the following command:
+2. **Create a new Webmin user:**
+   - Navigate to `Webmin Users`.
+   - Click on `Create a new Webmin user`.
+   - Enter a username and set "API key" as the authentication method.
+
+3. **Generate an API key:**
+   - Enable "API Access" in the user settings.
+   - Generate and copy the API key.
+   - Ensure the user has permissions for necessary Virtualmin modules.
+
+4. **Update the `.env` file:**
+   - Set `WEBMIN_SERVERS` to a comma-separated list of Webmin URLs.
+   - Set `WEBMIN_API_KEYS` to a comma-separated list of corresponding API keys, matching the order of servers.
+
+5. **Test the configuration:**
+   - Run the script to verify it fetches domains from each Webmin server using the API keys.
+
+## Running the Script
+
+To run the script manually:
+
 ```bash
-python check_ssl_and_domain_expiration.py
+python monitor_domains.py
 ```
-The script will:
-- Fetch domains from the configured Webmin servers.
-- Check SSL and domain registration expiration.
-- Log relevant information and send email alerts as necessary.
 
-## Important Notes
+## Automating the Script Execution
 
-- Make sure all environment variables are properly configured in the `.env` file.
-- If any required variable is missing, the script will log an error and exit.
-- Ensure that `whois` and `openssl` tools are installed and accessible in your system's PATH.
+To ensure the script runs regularly, you can set it up as a cron job:
 
-## Setting Up Dependencies
+1. **Edit the crontab:**
 
-Make sure to install all required Python packages by running the following command after cloning the repository:
-```bash
-pip install -r requirements.txt
-```
-This will install:
-- `requests`: For making HTTP requests to the Webmin API.
-- `python-dotenv`: For loading environment variables from the `.env` file.
-- `whois`: Required for performing WHOIS lookups.
+    Open the crontab editor:
 
-## Error Handling
+    ```bash
+    crontab -e
+    ```
 
-- The script includes checks for missing environment variables and will log an error and stop execution if any are missing.
-- If SMTP credentials are incorrect, the email alert will fail. Ensure that all SMTP-related variables are properly configured.
+2. **Add a cron job entry:**
+
+    To run the script daily at 2 AM, add the following line:
+
+    ```bash
+    0 2 * * * /usr/bin/python3 /path/to/your/script/monitor_domains.py >> /path/to/your/log/webmin_domains.log 2>&1
+    ```
+
+    - Replace `/usr/bin/python3` with the path to your Python interpreter.
+    - Replace `/path/to/your/script/` with the path to the script directory.
+    - Replace `/path/to/your/log/` with the path to the log directory.
+
+3. **Save and exit the editor.**
+
+The script will now run automatically every day at 2 AM.
 
 ## Logging
 
-- Logs are written to a rotating file specified by the `LOG_FILE` environment variable.
-- Logging levels can be adjusted directly in the script if necessary.
-
-## Example Configurations
-
-### `.env.sample`
-Create a file named `.env` from the example `.env.sample` provided below:
-```env
-# Webmin Configuration
-WEBMIN_SERVERS=http://server1:10000,http://server2:10000
-WEBMIN_USERS=username1,username2
-WEBMIN_PASSWORDS=password1,password2
-
-# SSL and Domain Expiration Configuration
-DOMAIN_FILE=domains.txt
-SSL_ALERT_DAYS=15
-DOMAIN_EXPIRATION_ALERT_DAYS=45
-
-# Logging Configuration
-LOG_FILE=webmin_domains.log
-
-# Email Configuration
-EMAIL_HOST=smtp.example.com
-EMAIL_PORT=587
-EMAIL_USER=your-email@example.com
-EMAIL_PASSWORD=your-email-password
-EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com
-EMAIL_SUBJECT_ssl_expiration=SSL Certificate Expiration Alert for {domain}
-EMAIL_MESSAGE_ssl_expiration=The SSL certificate for domain {domain} will expire soon. Please take action.
-EMAIL_SUBJECT_domain_expiration=Domain Registration Expiration Alert for {domain}
-EMAIL_MESSAGE_domain_expiration=The domain {domain} will expire soon. Please renew it.
-```
+Logs are stored in a rotating log file specified by the `LOG_FILE` variable in the `.env` file (default: `webmin_domains.log`). Log entries include domain checks, SSL checks, email notifications, and errors.
 
 ## Troubleshooting
 
-1. **SMTP Issues**:
-   - Verify that your SMTP credentials are correct.
-   - Ensure that your email provider allows third-party applications to send emails.
-2. **WHOIS Command Issues**:
-   - If the WHOIS command isn't working, ensure it is installed and accessible in the system's PATH.
-3. **OpenSSL Issues**:
-   - Make sure that OpenSSL is installed and accessible for SSL checks.
-4. **Script Fails to Fetch Domains**:
-   - Check if the Webmin API is enabled and accessible from the server running the script.
-   - Ensure the credentials are correct and have necessary permissions.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-## Contributions
-
-Feel free to submit issues or pull requests to improve this script.
+- **Mismatch in number of servers and API keys:** Ensure that the number of Webmin URLs matches the number of API keys in the `.env` file.
+- **Missing environment variables:** Check that all required variables are set in the `.env` file.
+- **Email sending issues:** Verify SMTP configuration and credentials.
+- **WHOIS or OpenSSL not found:** Ensure WHOIS and OpenSSL are installed and available in your system's PATH.
+- **Cron job issues:** Verify file paths, permissions, and correct configuration of cron.
 
 ## Author
 
-Created by Dr. Peter O'Hara-Diaz. Contributions and feedback are welcome!
+- **Dr. Peter O'Hara-Diaz**
+- Contact: [ripcdoc@example.com](mailto:ripcdoc@example.com)
 
-## Contact
+## License
 
-For support, please contact [po@floodgatetech.com].
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
