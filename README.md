@@ -52,7 +52,7 @@ Before using the script, make sure you have the following prerequisites:
      ```
 5. **SMTP Access**: Ensure that SMTP credentials are available to allow the script to send email alerts.
 
-### Dependencies
+## Dependencies
 
 This script requires several Python packages to function correctly. All the necessary packages are listed in the `requirements.txt` file included in this repository. Before proceeding with the installation, ensure you have Python and `pip` installed on your system.
 
