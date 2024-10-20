@@ -306,6 +306,5 @@ def main():
 #         time.sleep(CHECK_INTERVAL)
 
 if __name__ == "__main__":
-    main()  # Default single-run mode
-    # Uncomment the line below to enable continuous loop mode
+    main()  # Default single-run mode (comment this line out and uncomment the line below to enable continuous loop mode)
     # continuous_loop()
