@@ -12,12 +12,21 @@ This Python script helps administrators monitor the expiration of SSL certificat
 - **SSL Certificate Expiration Check**: Checks SSL certificate expiration dates and logs warnings if certificates are close to expiry.
 - **Domain Registration Expiration Check**: Verifies domain registration expiration dates and logs warnings if registrations are near expiry.
 - **Automatic Domain Management**: Updates the local domain file (`domains.txt`) by adding new domains and removing deleted ones.
-- **Logging**: Logs all events, including SSL and domain checks, additions, removals, and errors encountered during execution.
-- **Configurable**: Easily configure Webmin server URLs, API credentials, alert thresholds, and execution mode (single-run or continuous).
-- **Improved Error Handling**: Uses custom error classes for better error management and sends persistent error alerts when certain errors recur.
-- **Continuous Execution Option**: Allows switching between single-run and continuous loop modes by uncommenting specific lines in the script.
-- **Systemd Service Integration**: Can be set up as a systemd service for automatic execution.
-- **Cron Job Setup**: Can be run periodically in single-run mode using a cron job.
+- **Customizable Email Alerts with Jinja2 Templates**: Sends HTML and plain-text email alerts using Jinja2 templates. Users can customize the templates (`email_html.j2` and `email_plain.j2`) to personalize email content for SSL and domain expiration notifications.
+- **Improved Error Handling**: 
+  - Uses custom error classes (`WebminAuthError`, `WebminServerError`, `WebminConnectionError`) to manage specific errors, helping to differentiate between authentication errors, server errors, and connection issues.
+  - Implements persistent error alerts that trigger email notifications when the same error occurs consecutively beyond a defined threshold (`ERROR_ALERT_THRESHOLD`). The interval between persistent alerts is configurable with the `ERROR_ALERT_INTERVAL` setting.
+- **Logging**: Logs all events, including SSL and domain checks, additions, removals, and errors encountered during execution. Log entries are stored in a configurable log file (`webmin_domains.log`) with rotating file handlers to manage log size.
+- **Retry Mechanism for API Calls**: The script includes a retry mechanism that handles temporary network failures. It automatically retries failed API calls up to a specified number of attempts (`MAX_RETRIES`) with an exponentially increasing wait time (`RETRY_WAIT`).
+- **Configurable**: 
+  - Easily configure Webmin server URLs, API credentials, alert thresholds, retry attempts, and more through the `.env` file.
+  - Allows customization of alert thresholds for SSL and domain expiration to tailor the notification schedule based on specific needs.
+- **Continuous Execution Option**: 
+  - Provides the option to switch between single-run and continuous loop modes. In continuous loop mode, the script runs indefinitely, checking domain and SSL expiration at regular intervals (`CHECK_INTERVAL`).
+  - Can be integrated with systemd for automatic startup or set up as a cron job for scheduled execution in single-run mode.
+- **Systemd Service Integration**: Can be configured as a systemd service for continuous monitoring, with automatic restart capabilities and service management through systemd commands.
+- **Cron Job Setup**: Can be run periodically in single-run mode using a cron job, allowing for scheduled execution at specific times.
+- **Dynamic Worker Allocation**: Determines the number of workers dynamically based on available CPU cores, optimizing concurrent processing of API calls and reducing execution time.
 
 ## Why Use This Script?
 
