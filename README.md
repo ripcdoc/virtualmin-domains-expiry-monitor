@@ -355,7 +355,7 @@ Here’s an example of modifying the HTML template to include a custom message:
 
 Ensure that your template files are stored in the directory specified by the `TEMPLATE_DIR` environment variable. By default, the script will look for templates in `./templates`, but you can change this path in the `.env` file to point to a different location.
 
-### General Troubleshooting
+## Troubleshooting
 
 If the script fails to load a template or sends an incomplete email:
 - **Check the template file path**: Ensure that `TEMPLATE_DIR` points to the correct directory.
