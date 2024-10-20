@@ -11,8 +11,8 @@ Modules used:
 - Tenacity for retrying requests on failure.
 - smtplib for sending alert emails.
 
-Author: [Author's Name]
-Version: 1.0
+Author: Dr. Peter O'Hara-Diaz
+Version: 1.4
 """
 
 # Import necessary Python modules
