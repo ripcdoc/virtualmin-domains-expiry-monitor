@@ -1,10 +1,10 @@
-# Webmin Domain and SSL Monitoring Script
+# Webmin Domain Registration and SSL Expiry Monitoring Script with Jinja2 Templated Email Alerts and Comprehensive Error Handling with Persistent Alerts.
 
 ![Webmin Monitor Logo](expiry-monitor-logo.webp)
 
 ## Overview
 
-This Python script helps administrators monitor the expiration of SSL certificates and domain registrations for domains managed by Webmin/Virtualmin servers. It interacts with the Webmin API, fetches the list of domains, checks their SSL and domain registration expiration dates, and logs warnings if they are close to expiry. It also updates a local file (`domains.txt`) to track current domains and logs any changes.
+This Python script helps administrators monitor the expiration of SSL certificates and domain registrations for domains managed by Webmin/Virtualmin servers. It interacts with the Webmin API, fetches the list of domains, checks their SSL and domain registration expiration dates, and logs warnings if they are close to expiry. It also updates a local file (`domains.txt`) to track current domains and logs any changes. The script uses Jinja2 for templating and full customization of the email alerts.
 
 ## Features
 
@@ -38,40 +38,62 @@ WEBMIN_SERVERS=https://webmin1.example.com,https://webmin2.example.com,https://w
 WEBMIN_API_KEYS=api_key1,api_key2,api_key3
 
 # Email configuration for sending alerts
-EMAIL_HOST=smtp.example.com
-EMAIL_PORT=587
-EMAIL_USER=email@example.com
-EMAIL_PASSWORD=your-email-password
-EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com
+EMAIL_HOST=smtp.example.com       # SMTP server address
+EMAIL_PORT=587                    # SMTP server port (e.g., 587 for TLS)
+EMAIL_USER=email@example.com      # SMTP user for authentication
+EMAIL_PASSWORD=your-email-password # SMTP password for authentication
+EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com  # Comma-separated list of email recipients
 
 # Path to the domain file
-DOMAIN_FILE=domains.txt
+DOMAIN_FILE=domains.txt           # File to store the list of current domains
 
 # SSL and domain expiration alert thresholds
-SSL_ALERT_DAYS=15
-DOMAIN_EXPIRATION_ALERT_DAYS=45
+SSL_ALERT_DAYS=15                 # Number of days before SSL expiration to trigger an alert
+DOMAIN_EXPIRATION_ALERT_DAYS=45   # Number of days before domain expiration to trigger an alert
 
 # Retry configuration for network requests
-MAX_RETRIES=5           # Maximum number of retries for API calls
-RETRY_WAIT=5            # Initial wait time in seconds for retry, will increase exponentially
+MAX_RETRIES=5                     # Maximum number of retries for API calls
+RETRY_WAIT=5                      # Initial wait time in seconds for retries, increases exponentially
 
 # Log file configuration
-LOG_FILE=webmin_domains.log
+LOG_FILE=webmin_domains.log       # Log file for storing logs of script execution
 
 # Persistent error alert settings
-ERROR_ALERT_THRESHOLD=3 # Number of consecutive errors before sending a persistent error alert
-ERROR_ALERT_INTERVAL=86400 # Interval in seconds between persistent error alerts (default: 24 hours)
+ERROR_ALERT_THRESHOLD=3           # Number of consecutive errors before sending a persistent error alert
+ERROR_ALERT_INTERVAL=86400        # Interval in seconds between persistent error alerts (default: 24 hours)
 
 # Template directory (for Jinja2 templates)
-TEMPLATE_DIR=./templates
+TEMPLATE_DIR=./templates          # Directory where the Jinja2 email templates are stored
 
 # Customizable email templates
-EMAIL_TEMPLATE_HTML=email_html.j2
-EMAIL_TEMPLATE_PLAIN=email_plain.j2
+EMAIL_TEMPLATE_HTML=email_html.j2 # Jinja2 template for HTML email alerts
+EMAIL_TEMPLATE_PLAIN=email_plain.j2 # Jinja2 template for plain-text email alerts
 
 # Interval in seconds between runs in continuous mode
-CHECK_INTERVAL=86400  # Default: 24 hours
+CHECK_INTERVAL=86400              # Default interval: 24 hours
 ```
+
+### Additional Information on Configuration Variables
+
+- **WEBMIN_SERVERS & WEBMIN_API_KEYS**: 
+  - These variables must be set as comma-separated lists, and the order of API keys must correspond to the order of server URLs.
+  - Ensure that each Webmin server has a matching API key to avoid authentication errors.
+- **Email Configuration**:
+  - Make sure the SMTP credentials (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASSWORD`) are correctly set to enable sending email alerts.
+  - The `EMAIL_RECIPIENTS` field accepts multiple email addresses separated by commas, allowing alerts to be sent to multiple recipients simultaneously.
+- **SSL and Domain Expiration Alert Thresholds**:
+  - Adjust `SSL_ALERT_DAYS` and `DOMAIN_EXPIRATION_ALERT_DAYS` to set the desired threshold for when to receive alerts about upcoming expirations.
+  - For example, setting `SSL_ALERT_DAYS=10` will trigger an alert if an SSL certificate has 10 days or less until it expires.
+- **Retry Configuration**:
+  - `MAX_RETRIES` determines how many times the script will retry an API call in case of a failure.
+  - `RETRY_WAIT` sets the initial wait time for retries; this will increase exponentially (e.g., 5 seconds, 10 seconds, etc.) with each attempt.
+- **Persistent Error Alert Settings**:
+  - `ERROR_ALERT_THRESHOLD` sets the number of consecutive errors required to trigger a persistent error alert. If the same error occurs for this many times in a row, an alert will be sent.
+  - `ERROR_ALERT_INTERVAL` controls how often persistent error alerts are sent, preventing excessive email notifications for ongoing issues.
+- **Template Directory**:
+  - The `TEMPLATE_DIR` variable specifies where the Jinja2 templates are located. Ensure this path is correct to avoid errors when sending email alerts.
+- **Customizable Email Templates**:
+  - Modify `EMAIL_TEMPLATE_HTML` and `EMAIL_TEMPLATE_PLAIN` to change the content of email alerts. These templates use Jinja2 for dynamic content rendering, allowing you to customize the email layout and information.
 
 ## Running the Script
 
