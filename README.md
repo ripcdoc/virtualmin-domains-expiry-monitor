@@ -1,5 +1,7 @@
 # Webmin Domain and SSL Monitoring Script
 
+![Webmin Monitor Logo](./expiry-monitor-logo.webp)
+
 ## Overview
 
 This Python script is designed to help administrators monitor the **expiration of SSL certificates** and **domain registrations** for domains managed by **Webmin/Virtualmin servers**. The script interacts with the Webmin API, fetches the list of domains, checks their SSL and domain registration expiration dates, and logs warnings if they are close to expiry. It also updates a local file (`domains.txt`) to keep track of current domains and logs any changes.
