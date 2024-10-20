@@ -41,7 +41,115 @@ It supports both single-run and continuous execution modes and can be set up as 
 - **Flexible and Extendable**: Written in a modular way, making it easy to customize or add additional features.
 - **Simple to Use**: Easy setup with basic Python knowledge, making it a valuable tool for administrators managing Webmin servers.
 
-## Configuration
+## Quick Start Guide
+
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/ripcdoc/virtualmin-domains-expiry-monitor.git
+cd virtualmin-domains-expiry-monitor
+```
+
+### Step 2: Install Python Dependencies
+
+1. Ensure you have Python 3 installed.
+2. Install required packages from the `requirements.txt` file:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Step 3: Configure the `.env` File
+
+1. Rename the `.env.example` file to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+2. Open the `.env` file and set the following values:
+   - **Webmin server URLs and API keys**: `WEBMIN_SERVERS` & `WEBMIN_API_KEYS`
+   - **Email settings**: `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASSWORD`, `EMAIL_RECIPIENTS`
+   - **Other settings**: Adjust SSL alert days, domain expiration days, retry settings, etc., as needed.
+
+> **Important:** Ensure that API access is properly set up in your Webmin control panel.
+
+### Step 4: Verify the Template Files
+
+1. Check the `templates/` directory for the default email templates: 
+   - `email_html.j2`
+   - `email_plain.j2`
+2. If you wish to customize the templates, create new files and update the `.env` file with the new template names.
+
+### Step 5: Run the Script in Single-Run Mode
+
+1. Execute the script once to check domain and SSL expiration:
+   ```bash
+   python monitor_domains.py
+   ```
+2. Check the output in the console and the log file (`webmin_domains.log`) to ensure proper execution.
+
+### Step 6: Enable Continuous Loop Mode (Optional)
+
+1. Open the `monitor_domains.py` script.
+2. Locate these lines near the end of the script:
+   ```python
+   if __name__ == "__main__":
+       main()  # Default single-run mode
+       # continuous_loop()  # Uncomment this line to enable continuous loop mode
+   ```
+3. Modify as follows:
+   ```python
+   if __name__ == "__main__":
+       # main()  # Default single-run mode
+       continuous_loop()  # Uncomment this line to enable continuous loop mode
+   ```
+4. Save the script and run it:
+   ```bash
+   python monitor_domains.py
+   ```
+
+### Step 7: (Optional) Set Up as a Systemd Service
+
+1. Create a systemd service file:
+   ```bash
+   sudo nano /etc/systemd/system/webmin-monitor.service
+   ```
+2. Add the following configuration:
+   ```ini
+   [Unit]
+   Description=Webmin Domain and SSL Monitoring Script (Continuous)
+   After=network.target
+
+   [Service]
+   Type=simple
+   User=your-username
+   WorkingDirectory=/path/to/your/script/
+   ExecStart=/usr/bin/python3 /path/to/your/script/monitor_domains.py
+   Restart=always
+   RestartSec=10
+   EnvironmentFile=/path/to/your/script/.env
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+   - Replace `your-username` and `/path/to/your/script/` as appropriate.
+
+3. Enable and start the service:
+   ```bash
+   sudo systemctl enable webmin-monitor.service
+   sudo systemctl start webmin-monitor.service
+   ```
+
+### Step 8: Review Logs and Monitor Alerts
+
+- Check the log file for any errors or warnings:
+  ```bash
+  tail -f webmin_domains.log
+  ```
+- Monitor your email for alerts about SSL or domain expirations.
+
+> **Note:** If you encounter issues, refer to the **Troubleshooting** section in the README.
+
+## Detailed Configuration Guide
 
 ### Setting Up Webmin API
 
