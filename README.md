@@ -166,29 +166,68 @@ The script will now run automatically at the specified time, logging the output 
 
 ### Enabling Continuous Loop Mode
 
-To enable continuous execution, follow these steps:
 
-1. **Open the script file** (`monitor_domains.py`) in a text editor.
-2. Locate the following lines near the end of the script:
-   ```python
-   if __name__ == "__main__":
-       main()  # Default single-run mode
-       # continuous_loop()  # Uncomment this line to enable continuous loop mode
-   ```
-3. **Modify the code** as follows:
-   - **Comment out** the line that calls `main()` by adding a `#` at the start of the line.
-   - **Uncomment** the line that calls `continuous_loop()` by removing the `#` at the start.
-4. The modified code should look like this:
-   ```python
-   if __name__ == "__main__":
-       # main()  # Default single-run mode
-       continuous_loop()  # Uncomment this line to enable continuous loop mode
-   ```
-5. Save the changes and rerun the script to activate continuous loop mode.
 
-> **Warning:** Enabling continuous loop mode will cause the script to run indefinitely, checking domain and SSL expiration at regular intervals. Make sure to monitor resource usage and be prepared to manually terminate the process if needed.
+
+
+
+
+
+To enable continuous execution, you need to make **two modifications** in the script:
+
+1. **Uncomment the Continuous Loop Function Block:**
+   - Locate the block of code defining the `continuous_loop()` function, which is **commenteded out** by default.
+   - Uncomment this entire block to enable continuous execution.
+
+2. **Switch from `main()` to `continuous_loop()`:**
+   - Change the function call at the end of the script from `main()` to `continuous_loop()`.
+   
+Follow these detailed steps:
+
+#### Step 1: Uncomment the Continuous Loop Block
+
+Open the script (`monitor_domains.py`) in a text editor and locate the following block of code:
+
+##### Before (Commented Out)
+```python
+# def continuous_loop():
+#     while True:
+#         main()
+#         logger.info(f"Sleeping for {CHECK_INTERVAL} seconds before the next run.")
+#         time.sleep(CHECK_INTERVAL)
+```
+
+##### After (Uncommented)
+```python
+def continuous_loop():
+    while True:
+        main()
+        logger.info(f"Sleeping for {CHECK_INTERVAL} seconds before the next run.")
+        time.sleep(CHECK_INTERVAL)
+```
+
+#### Step 2: Modify the Function Call at the End of the Script
+
+Locate the following lines near the end of the script:
+
+##### Before (Single-Run Mode Enabled)
+```python
+if __name__ == "__main__":
+    main()  # Default single-run mode
+    # continuous_loop()  # Uncomment this line to enable continuous loop mode
+```
+
+##### After (Continuous Loop Mode Enabled)
+```python
+if __name__ == "__main__":
+    # main()  # Default single-run mode
+    continuous_loop()  # Uncomment this line to enable continuous loop mode
+```
+
+> **Important Note:** Enabling continuous loop mode will cause the script to run continuously, checking for domain and SSL expiration at regular intervals. Make sure you are aware of this behavior and monitor resource usage accordingly.
 
 > **Note:** The frequency of checks in continuous mode is determined by the `CHECK_INTERVAL` setting in the `.env` file, with a default interval of 24 hours (86400 seconds).
+```
 
 #### To run as a Systemd Service in Continuous Loop Mode
 
