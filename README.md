@@ -221,7 +221,7 @@ To set up the script as a systemd service for continuous execution:
 
 The script will now run as a continuous service, restarting automatically if it fails and running indefinitely.
 
-## Improved Error Handling
+## Comprehensive Error Handling
 
 - **Custom Error Classes**: 
   - The script uses custom error classes (`WebminAuthError`, `WebminServerError`, `WebminConnectionError`) to manage specific errors.
@@ -243,7 +243,7 @@ The script will now run as a continuous service, restarting automatically if it 
   - All errors, including specific error codes and messages, are logged in the configured log file (`webmin_domains.log`).
   - The log includes additional details for persistent error alerts, including the type of error, affected Webmin server, and timestamp of the occurrence.
 
-- **Example of Improved Error Handling in Action**: 
+- **Example of Comprehensive Error Handling in Action**: 
   - If the script encounters an authentication error while connecting to a Webmin server, it logs the error, triggers retries (if configured), and sends a persistent alert if the issue continues beyond the defined threshold.
   - Similarly, in the case of server-side errors (e.g., HTTP 500), the script logs the error, retries the connection, and triggers an alert if the problem persists.
 
