@@ -166,13 +166,6 @@ The script will now run automatically at the specified time, logging the output 
 
 ### Enabling Continuous Loop Mode
 
-
-
-
-
-
-
-
 To enable continuous execution, you need to make **two modifications** in the script:
 
 1. **Uncomment the Continuous Loop Function Block:**
@@ -182,7 +175,7 @@ To enable continuous execution, you need to make **two modifications** in the sc
 2. **Switch from `main()` to `continuous_loop()`:**
    - Change the function call at the end of the script from `main()` to `continuous_loop()`.
    
-Follow these detailed steps:
+**Follow these detailed steps:**
 
 #### Step 1: Uncomment the Continuous Loop Block
 
@@ -227,7 +220,6 @@ if __name__ == "__main__":
 > **Important Note:** Enabling continuous loop mode will cause the script to run continuously, checking for domain and SSL expiration at regular intervals. Make sure you are aware of this behavior and monitor resource usage accordingly.
 
 > **Note:** The frequency of checks in continuous mode is determined by the `CHECK_INTERVAL` setting in the `.env` file, with a default interval of 24 hours (86400 seconds).
-```
 
 #### To run as a Systemd Service in Continuous Loop Mode
 
