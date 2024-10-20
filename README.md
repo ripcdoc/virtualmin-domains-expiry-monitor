@@ -43,6 +43,34 @@ It supports both single-run and continuous execution modes and can be set up as 
 
 ## Configuration
 
+### Setting Up Webmin API
+
+Before running the script, you must configure the Webmin API to allow it to retrieve domain and SSL information. Follow these steps to set up the Webmin API properly:
+
+1. **Enable Webmin Remote API**:
+   - Log into Webmin as an administrator.
+   - Navigate to **Webmin Configuration** > **Webmin Modules** > **Remote API**.
+   - Enable the Remote API by checking the option “Enable Remote API.”
+
+2. **Create an API User or Token**:
+   - Go to **Webmin Users** > **Create a new Webmin User**.
+   - Assign the user a username and a strong password or API token.
+   - Ensure the user has access permissions to the **Virtualmin Module** or **Domain Management**.
+
+3. **Set Permissions**:
+   - Ensure the new API user has read access to domain and SSL certificate information.
+   - Adjust permissions under **Webmin Users** to allow “API-only access” and restrict other admin functionalities for better security.
+
+4. **Firewall Settings**:
+   - Ensure that the firewall on the Webmin server allows incoming traffic on port 10000 (or the configured Webmin port).
+   - Configure specific IP allowlists or rules to permit access only from trusted IPs if possible.
+
+5. **Verify API Endpoint and Keys**:
+   - The API endpoint format should be: `https://<webmin-server>/virtual-server/remote.cgi`.
+   - Set the `WEBMIN_SERVERS` and `WEBMIN_API_KEYS` environment variables accordingly in the `.env` file.
+
+This configuration ensures that the Webmin API is correctly set up for the script to fetch domain and SSL information seamlessly.
+
 ### Setting Up the Environment File
 Before running the script, ensure the `.env` file is correctly set up with the variables listed below.
 
@@ -102,7 +130,9 @@ CHECK_INTERVAL=86400              # Default interval: 24 hours
   - The `EMAIL_RECIPIENTS` field accepts multiple email addresses separated by commas, allowing alerts to be sent to multiple recipients simultaneously.
 - **SSL and Domain Expiration Alert Thresholds**:
   - Adjust `SSL_ALERT_DAYS` and `DOMAIN_EXPIRATION_ALERT_DAYS` to set the desired threshold for when to receive alerts about upcoming expirations.
-  - For example, setting `SSL_ALERT_DAYS=10` will trigger an alert if an SSL certificate has 10 days or less until it expires.
+  - For example, setting `SSL_ALERT_DAYS=10` will trigger an
+
+ alert if an SSL certificate has 10 days or less until it expires.
 - **Retry Configuration**:
   - `MAX_RETRIES` determines how many times the script will retry an API call in case of a failure.
   - `RETRY_WAIT` sets the initial wait time for retries; this will increase exponentially (e.g., 5 seconds, 10 seconds, etc.) with each attempt.
@@ -164,62 +194,18 @@ To run the script periodically in single-run mode, you can set up a cron job:
 
 The script will now run automatically at the specified time, logging the output to the specified log file.
 
-### Enabling Continuous Loop Mode
+### Continuous Loop Mode
 
-To enable continuous execution, you need to make **two modifications** in the script:
-
-1. **Uncomment the Continuous Loop Function Block:**
-   - Locate the block of code defining the `continuous_loop()` function, which is **commenteded out** by default.
-   - Uncomment this entire block to enable continuous execution.
-
-2. **Switch from `main()` to `continuous_loop()`:**
-   - Change the function call at the end of the script from `main()` to `continuous_loop()`.
-   
-**Follow these detailed steps:**
-
-#### Step 1: Uncomment the Continuous Loop Block
-
-Open the script (`monitor_domains.py`) in a text editor and locate the following block of code:
-
-##### Before (Commented Out)
-```python
-# def continuous_loop():
-#     while True:
-#         main()
-#         logger.info(f"Sleeping for {CHECK_INTERVAL} seconds before the next run.")
-#         time.sleep(CHECK_INTERVAL)
-```
-
-##### After (Uncommented)
-```python
-def continuous_loop():
-    while True:
-        main()
-        logger.info(f"Sleeping for {CHECK_INTERVAL} seconds before the next run.")
-        time.sleep(CHECK_INTERVAL)
-```
-
-#### Step 2: Modify the Function Call at the End of the Script
-
-Locate the following lines near the end of the script:
-
-##### Before (Single-Run Mode Enabled)
-```python
-if __name__ == "__main__":
-    main()  # Default single-run mode
-    # continuous_loop()  # Uncomment this line to enable continuous loop mode
-```
-
-##### After (Continuous Loop Mode Enabled)
-```python
-if __name__ == "__main__":
-    # main()  # Default single-run mode
-    continuous_loop()  # Uncomment this line to enable continuous loop mode
-```
-
-> **Important Note:** Enabling continuous loop mode will cause the script to run continuously, checking for domain and SSL expiration at regular intervals. Make sure you are aware of this behavior and monitor resource usage accordingly.
-
-> **Note:** The frequency of checks in continuous mode is determined by the `CHECK_INTERVAL` setting in the `.env` file, with a default interval of 24 hours (86400 seconds).
+To enable continuous execution, follow these steps:
+  1. Open the script file in a text editor.
+  2. Locate the following lines near the end of the script:
+     ```python
+     if __name__ == "__main__":
+         # main()  # Default single-run mode
+         continuous_loop()  # Uncomment this line to enable continuous loop mode
+     ```
+  3. Uncomment the `continuous_loop()` line and comment out the `main()` line then uncomment the continuous loop block to switch to continuous mode (clear instructions are included in the script as to what should be uncommented and what to comment out).
+  4. The script will now run continuously, checking for domain and SSL expiration every `CHECK_INTERVAL` seconds.
 
 #### To run as a Systemd Service in Continuous Loop Mode
 
@@ -329,7 +315,9 @@ The HTML template includes:
 #### Plaintext Template (`email_plain.j2`)
 
 The plaintext template includes:
-- **Basic Structure**: Simple text layout with variables like `{{ domain }}`, `{{ expiration_type }}`, and `{{ days_until_expire }}`.
+- **Basic Structure**: Simple text layout with variables like `{{ domain }}`, `{{ expiration_type }}`,
+
+ and `{{ days_until_expire }}`.
 - **Support and Footer Links**: Plain URLs are provided for easy navigation. Update the URLs to point to your actual support page and website.
 
 ### Modifying the Templates
@@ -389,7 +377,7 @@ The expected dependencies include:
 - `jinja2`
 - `smtplib` (built-in)
 
-> **(Optional) Recommendation for Python Experienced Users:**
+> **Unsupported Recommendation for Python Experienced Users:**
 > Use a virtual environment to manage dependencies and prevent conflicts with other Python projects. To create and activate a virtual environment, run:
 > ```bash
 > python3 -m venv venv
