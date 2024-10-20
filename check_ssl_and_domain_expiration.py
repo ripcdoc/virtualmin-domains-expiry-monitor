@@ -1,3 +1,5 @@
+__version__ = "1.0.7"  # Initial Released Version
+
 from dotenv import load_dotenv
 import os
 import logging
