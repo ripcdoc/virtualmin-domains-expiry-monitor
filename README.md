@@ -1,6 +1,6 @@
 # Webmin Domain and SSL Monitoring Script
 
-![Webmin Monitor Logo](webmin-monitor-logo.webp)
+![Webmin Monitor Logo](expiry-monitor-logo.webp)
 
 ## Overview
 
