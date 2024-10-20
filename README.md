@@ -150,7 +150,7 @@ To enable continuous execution, follow these steps:
          # main()  # Default single-run mode
          continuous_loop()  # Uncomment this line to enable continuous loop mode
      ```
-  3. Uncomment the `continuous_loop()` line and comment out the `main()` line to switch to continuous mode.
+  3. Uncomment the `continuous_loop()` line and comment out the `main()` line then uncomment the continuous loop block to switch to continuous mode (clear instructions are included in the script as to what should be uncommented and what to comment out).
   4. The script will now run continuously, checking for domain and SSL expiration every `CHECK_INTERVAL` seconds.
 
 #### To run as a Systemd Service in Continuous Loop Mode
