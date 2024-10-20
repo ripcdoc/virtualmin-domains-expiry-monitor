@@ -41,6 +41,7 @@ Sets parameters for SSL certificate (`SSL_ALERT_DAYS`) and domain registration (
 3. **Logging Setup:**
 
 Configures a logger that writes messages to a log file (`webmin_domains.log`) with rotating capabilities to avoid excessive growth of log files.
+All events and errors are logged in a rotating log file for easy monitoring and troubleshooting.
 
 4. **Maintain Master List of Domains**
 
