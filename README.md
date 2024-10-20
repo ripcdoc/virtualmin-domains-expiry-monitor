@@ -37,6 +37,7 @@ It supports both single-run and continuous execution modes and can be set up as 
 
 - **Proactive Monitoring**: Get alerted well in advance of SSL or domain expiration to prevent downtime, security risks, or unexpected loss of domain ownership.
 - **Automated Updates**: Automatically syncs the domain list from Webmin, removing the need for manual domain management.
+  - **Note:** The `domains.txt` file, which stores the list of domains, will be created automatically during the first run if it doesn't already exist. This ensures seamless initialization and operation without any additional setup.
 - **Flexible and Extendable**: Written in a modular way, making it easy to customize or add additional features.
 - **Simple to Use**: Easy setup with basic Python knowledge, making it a valuable tool for administrators managing Webmin servers.
 
