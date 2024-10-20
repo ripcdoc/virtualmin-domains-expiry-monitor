@@ -164,18 +164,31 @@ To run the script periodically in single-run mode, you can set up a cron job:
 
 The script will now run automatically at the specified time, logging the output to the specified log file.
 
-### Continuous Loop Mode
+### Enabling Continuous Loop Mode
 
 To enable continuous execution, follow these steps:
-  1. Open the script file in a text editor.
-  2. Locate the following lines near the end of the script:
-     ```python
-     if __name__ == "__main__":
-         # main()  # Default single-run mode
-         continuous_loop()  # Uncomment this line to enable continuous loop mode
-     ```
-  3. Uncomment the `continuous_loop()` line and comment out the `main()` line then uncomment the continuous loop block to switch to continuous mode (clear instructions are included in the script as to what should be uncommented and what to comment out).
-  4. The script will now run continuously, checking for domain and SSL expiration every `CHECK_INTERVAL` seconds.
+
+1. **Open the script file** (`monitor_domains.py`) in a text editor.
+2. Locate the following lines near the end of the script:
+   ```python
+   if __name__ == "__main__":
+       main()  # Default single-run mode
+       # continuous_loop()  # Uncomment this line to enable continuous loop mode
+   ```
+3. **Modify the code** as follows:
+   - **Comment out** the line that calls `main()` by adding a `#` at the start of the line.
+   - **Uncomment** the line that calls `continuous_loop()` by removing the `#` at the start.
+4. The modified code should look like this:
+   ```python
+   if __name__ == "__main__":
+       # main()  # Default single-run mode
+       continuous_loop()  # Uncomment this line to enable continuous loop mode
+   ```
+5. Save the changes and rerun the script to activate continuous loop mode.
+
+> **Warning:** Enabling continuous loop mode will cause the script to run indefinitely, checking domain and SSL expiration at regular intervals. Make sure to monitor resource usage and be prepared to manually terminate the process if needed.
+
+> **Note:** The frequency of checks in continuous mode is determined by the `CHECK_INTERVAL` setting in the `.env` file, with a default interval of 24 hours (86400 seconds).
 
 #### To run as a Systemd Service in Continuous Loop Mode
 
