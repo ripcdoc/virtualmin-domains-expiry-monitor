@@ -201,12 +201,28 @@ The script will now run as a continuous service, restarting automatically if it 
 ## Improved Error Handling
 
 - **Custom Error Classes**: 
-  - The script uses custom error classes (`WebminAuthError`, `WebminServerError`, `WebminConnectionError`) to handle specific errors.
-  - This helps to differentiate between authentication errors, server errors, and connection issues, making troubleshooting easier.
-
+  - The script uses custom error classes (`WebminAuthError`, `WebminServerError`, `WebminConnectionError`) to manage specific errors.
+  - These classes help differentiate between authentication errors (e.g., 401 Unauthorized), server-side errors (e.g., 500 Internal Server Errors), and connection-related issues (e.g., timeouts, request failures).
+  - By using custom error handling, the script can manage issues more effectively, log detailed error messages, and adjust the retry mechanism as needed.
+  
 - **Persistent Error Alerts**: 
-  - If a specific error (e.g., unauthorized access) occurs repeatedly beyond the `ERROR_ALERT_THRESHOLD`, the script sends an email alert.
-  - The interval between alerts is controlled by the `ERROR_ALERT_INTERVAL` variable.
+  - If a specific error (e.g., unauthorized access, server error) occurs repeatedly beyond the `ERROR_ALERT_THRESHOLD`, the script sends an email alert to notify administrators of the persistent issue.
+  - The interval between persistent alerts is managed by the `ERROR_ALERT_INTERVAL` variable, ensuring that alerts are sent only after a specified duration to avoid overwhelming users with repeated notifications.
+  - For example, if `ERROR_ALERT_THRESHOLD=3` and the same error occurs three times in succession, the script triggers a persistent error alert.
+  - This mechanism prevents alert fatigue while ensuring that significant issues are escalated promptly.
+
+- **Retry Mechanism**: 
+  - The script includes a built-in retry mechanism for handling temporary network failures or timeouts.
+  - It uses exponential backoff for retries, starting with an initial wait time (`RETRY_WAIT`) and increasing it exponentially up to the maximum number of retries (`MAX_RETRIES`).
+  - This approach improves reliability, allowing the script to recover from temporary connectivity issues without manual intervention.
+
+- **Detailed Logging**: 
+  - All errors, including specific error codes and messages, are logged in the configured log file (`webmin_domains.log`).
+  - The log includes additional details for persistent error alerts, including the type of error, affected Webmin server, and timestamp of the occurrence.
+
+- **Example of Improved Error Handling in Action**: 
+  - If the script encounters an authentication error while connecting to a Webmin server, it logs the error, triggers retries (if configured), and sends a persistent alert if the issue continues beyond the defined threshold.
+  - Similarly, in the case of server-side errors (e.g., HTTP 500), the script logs the error, retries the connection, and triggers an alert if the problem persists.
 
 ## Additional Information
 
