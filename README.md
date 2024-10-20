@@ -1,194 +1,186 @@
-# Webmin/Virtualmin Domain and SSL Monitoring Script
+# Webmin Domain and SSL Monitoring Script
 
-![Expiry Monitor Logo](expiry-monitor-logo.webp)
+![Webmin Monitor Logo](webmin-monitor-logo.png)
 
 ## Overview
 
-This Python script monitors SSL certificate expirations and domain registration expirations for domains managed by Webmin/Virtualmin servers. It uses the Webmin API to automatically fetch domain lists and check for SSL and domain registration expirations. The script also sends email alerts to notify administrators when domains or SSL certificates are approaching their expiration dates.
+This Python script is designed to help administrators monitor the expiration of SSL certificates and domain registrations for domains managed by Webmin/Virtualmin servers. The script interacts with the Webmin API, fetches the list of domains, checks their SSL and domain registration expiration dates, and logs warnings if they are close to expiry. It also updates a local file (`domains.txt`) to keep track of current domains and logs any changes.
 
 ## Features
 
-- **Domain List Fetching from Webmin API**: Automatically retrieves domain lists from Webmin servers using their respective API keys.
-- **SSL Certificate Expiration Monitoring**: Checks SSL certificates for expiration and sends alerts when they are close to expiring.
-- **Domain Registration Expiration Monitoring**: Tracks domain registration expiration dates and sends notifications when they approach expiration.
-- **Email Alerts**: Sends alerts to specified email recipients regarding SSL and domain registration expirations.
-- **Rotating Log File**: All actions, including successful checks and errors, are logged in a rotating log file.
-- **Simple End-User Configuration**: Uses environment variables for easy configuration.
-- **Automated Execution**: Supports scheduling via cron job for regular checks (could be modified to run as a `systemd` service).
+- **Fetch Domain List from Webmin API**: Automatically retrieves the list of domains from one or more Webmin servers using the Webmin API.
+- **SSL Certificate Expiration Check**: Checks the SSL certificate expiration date for each domain and logs a warning if the certificate is within 15 days of expiration.
+- **Domain Registration Expiration Check**: Verifies the domain registration expiration and logs a warning if the registration is within 45 days of expiration.
+- **Automatic Domain Management**: Updates the local domain file (`domains.txt`) by adding new domains and removing deleted ones.
+- **Logging**: Logs all events, including SSL and domain checks, additions, and removals, as well as any errors encountered during execution.
+- **Configurable**: Easily configure Webmin server URLs, API credentials, alert thresholds, and execution mode (single-run or continuous).
+- **Improved Error Handling**: Uses custom error classes for better error management and persistent error alerts when certain errors recur.
+- **Continuous Execution Option**: Allows switching between single-run and continuous loop modes by uncommenting specific lines in the script.
 
 ## Why Use This Script?
 
-- **Proactive Monitoring**: Be alerted in advance to prevent downtime, security risks, or unexpected loss of domain ownership.
-- **Centralized Management**: Allows administrators to manage multiple Webmin servers from a single script.
-- **Automated Updates**: Reduces manual oversight by automatically updating and tracking domains.
-- **Simple Configuration**: Easy-to-set-up environment variables make it flexible and adaptable to various use cases.
+- **Proactive Monitoring**: Get alerted well in advance of SSL or domain expiration to prevent downtime, security risks, or unexpected loss of domain ownership.
+- **Automated Updates**: Save time by automatically syncing the domain list from Webmin, removing the need for manual domain management.
+- **Flexible and Extendable**: The Python script is written in a modular way, making it easy to customize for specific needs or to add additional features.
+- **Simple to Use**: With basic Python knowledge, users can easily set up and run this script, making it a valuable tool for administrators managing Webmin servers.
 
-## Prerequisites
+## How It Works
 
-Ensure you have the following prerequisites installed:
+1. **Fetches Domain List from Webmin Servers**: 
+   - Uses the Webmin API to retrieve the list of domains.
+   - Updates the local domain file (`domains.txt`).
 
-1. **Python 3.6+**
-   - Check Python version: `python --version`
+2. **Checks SSL Certificate Expiration**: 
+   - Uses OpenSSL to check the expiration date of SSL certificates.
 
-2. **pip**: Python's package manager.
-   - Install pip if not already installed.
+3. **Checks Domain Registration Expiration**: 
+   - Uses WHOIS to verify domain registration expiration dates.
 
-3. **WHOIS Tool**: Used for domain registration checks.
-   - Install WHOIS:
-     - Ubuntu/Debian: `sudo apt-get install whois`
-     - CentOS/RHEL: `sudo yum install whois`
+4. **Logs Results**: 
+   - All activities and errors are logged in a rotating log file (`webmin_domains.log`).
 
-4. **OpenSSL**: Used for checking SSL certificates.
-   - Install OpenSSL:
-     - Ubuntu/Debian: `sudo apt-get install openssl`
-     - CentOS/RHEL: `sudo yum install openssl`
-
-5. **SMTP Access**: SMTP credentials for sending email alerts.
-
-## Dependencies
-
-Install required Python packages using the `requirements.txt` file:
-
-```bash
-pip install -r requirements.txt
-```
-
-## Installation
-
-### Option 1: Clone the Repository
-
-1. **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/ripcdoc/virtualmin-domains-expiry-monitor.git
-    cd virtualmin-domains-expiry-monitor
-    ```
-
-2. **Install dependencies:**
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-3. **Set up the `.env` file:**
-
-    Create a `.env` file in the root directory using the template provided in the included `env.sample` file.
-
-### Option 2: Manual Download
-
-If you prefer to manually download the script instead of cloning the GitHub repository, follow these steps:
-
-1. **Download the script:**
-   - Go to the GitHub repository page: [virtualmin-domains-expiry-monitor](https://github.com/ripcdoc/virtualmin-domains-expiry-monitor).
-   - Click on the script file(s) and use the "Download" button to save them to your local system.
-
-2. **Install the prerequisites:**
-   - Make sure you have Python 3.6+ installed.
-   - Install the required Python packages using pip:
-
-     ```bash
-     pip install -r requirements.txt
-     ```
-
-   - You can create a `requirements.txt` file yourself with the following content:
-
-     ```
-     python-dotenv
-     requests
-     tenacity
-     smtplib
-     ```
-
-3. **Set up the `.env` file:**
-   - Create a new file named `.env` in the same directory as the script and use the following template:
-
-     ```env
-     WEBMIN_SERVERS=https://webmin1.example.com,https://webmin2.example.com,https://webmin3.example.com
-     WEBMIN_API_KEYS=api_key1,api_key2,api_key3
-     EMAIL_HOST=smtp.example.com
-     EMAIL_PORT=587
-     EMAIL_USER=email@example.com
-     EMAIL_PASSWORD=your-email-password
-     EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com
-     DOMAIN_FILE=domains.txt
-     SSL_ALERT_DAYS=15
-     DOMAIN_EXPIRATION_ALERT_DAYS=45
-     MAX_RETRIES=3
-     RETRY_WAIT=5
-     LOG_FILE=webmin_domains.log
-     ```
-
-4. **Run the script:**
-
-    To run the script manually:
-
-    ```bash
-    python monitor_domains.py
-    ```
+5. **Handles Errors and Alerts**: 
+   - Uses custom error classes to handle different errors (e.g., unauthorized access, server errors).
+   - Sends persistent error alerts if specific errors (e.g., 401 Unauthorized) recur.
 
 ## Configuration
 
-### Setting Up Webmin API Users and API Keys
+Before running the script, set up the `.env` file with the following variables:
 
-1. **Log in to each Webmin server:**
-   - Access the Webmin dashboard at `https://<your-server-ip>:10000/` and log in.
+```env
+# Webmin server URLs (comma-separated)
+WEBMIN_SERVERS=https://webmin1.example.com,https://webmin2.example.com,https://webmin3.example.com
 
-2. **Create a new Webmin user:**
-   - Navigate to `Webmin Users`.
-   - Click on `Create a new Webmin user`.
-   - Enter a username and set "API key" as the authentication method.
+# Corresponding API keys for Webmin servers (comma-separated, in the same order as WEBMIN_SERVERS)
+WEBMIN_API_KEYS=api_key1,api_key2,api_key3
 
-3. **Generate an API key:**
-   - Enable "API Access" in the user settings.
-   - Generate and copy the API key.
-   - Ensure the user has permissions for necessary Virtualmin modules.
+# Email configuration for sending alerts
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_USER=email@example.com
+EMAIL_PASSWORD=your-email-password
+EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com
 
-4. **Update the `.env` file:**
-   - Set `WEBMIN_SERVERS` to a comma-separated list of Webmin URLs.
-   - Set `WEBMIN_API_KEYS` to a comma-separated list of corresponding API keys, matching the order of servers.
+# Path to the domain file
+DOMAIN_FILE=domains.txt
 
-5. **Test the configuration:**
-   - Run the script to verify it fetches domains from each Webmin server using the API keys.
+# SSL and domain expiration alert thresholds
+SSL_ALERT_DAYS=15
+DOMAIN_EXPIRATION_ALERT_DAYS=45
 
-## Automating the Script Execution
+# Retry configuration for network requests
+MAX_RETRIES=5           # Maximum number of retries for API calls
+RETRY_WAIT=5            # Initial wait time in seconds for retry, will increase exponentially
 
-To ensure the script runs regularly, you can set it up as a cron job:
+# Log file configuration
+LOG_FILE=webmin_domains.log
 
-1. **Edit the crontab:**
+# Persistent error alert settings
+ERROR_ALERT_THRESHOLD=3 # Number of consecutive errors before sending a persistent error alert
+ERROR_ALERT_INTERVAL=86400 # Interval in seconds between persistent error alerts (default: 24 hours)
 
-    Open the crontab editor:
+# Template directory (for Jinja2 templates)
+TEMPLATE_DIR=./templates
 
-    ```bash
-    crontab -e
-    ```
+# Customizable email templates
+EMAIL_TEMPLATE_HTML=email_html.j2
+EMAIL_TEMPLATE_PLAIN=email_plain.j2
 
-2. **Add a cron job entry:**
+# Interval in seconds between runs in continuous mode
+CHECK_INTERVAL=86400  # Default: 24 hours
+```
 
-    To run the script daily at 2 AM, add the following line:
 
-    ```bash
-    0 2 * * * /usr/bin/python3 /path/to/your/script/monitor_domains.py >> /path/to/your/log/webmin_domains.log 2>&1
-    ```
 
-    - Replace `/usr/bin/python3` with the path to your Python interpreter.
-    - Replace `/path/to/your/script/` with the path to the script directory.
-    - Replace `/path/to/your/log/` with the path to the log directory.
 
-3. **Save and exit the editor.**
 
-The script will now run automatically every day at 2 AM.
 
-## Logging
 
-Logs are stored in a rotating log file specified by the `LOG_FILE` variable in the `.env` file (default: `webmin_domains.log`). Log entries include domain checks, SSL checks, email notifications, and errors.
 
-## Troubleshooting
+### Switching to Continuous Execution mode
 
-- **Mismatch in number of servers and API keys:** Ensure that the number of Webmin URLs matches the number of API keys in the `.env` file.
-- **Missing environment variables:** Check that all required variables are set in the `.env` file.
-- **Email sending issues:** Verify SMTP configuration and credentials.
-- **WHOIS or OpenSSL not found:** Ensure WHOIS and OpenSSL are installed and available in your system's PATH.
-- **Cron job issues:** Verify file paths, permissions, and correct configuration of cron.
+The script can be run in two modes: **single-run** or **continuous loop**.
+
+- **Single-Run Mode**: By default, the script runs once and then exits.
+- **Continuous Loop Mode**: To enable continuous execution, follow these steps:
+  1. Open the script file in a text editor.
+  2. Locate the following lines near the end of the script:
+     ```python
+     if __name__ == "__main__":
+         # main()  # Default single-run mode
+         continuous_loop()  # Uncomment this line to enable continuous loop mode
+     ```
+  3. Uncomment the `continuous_loop()` line and comment out the `main()` line to switch to continuous mode.
+  4. The script will now run continuously, checking for domain and SSL expiration every `CHECK_INTERVAL` seconds.
+
+#### Running as a Systemd Service (if using Continuous Execution mode)
+
+To set up the script as a systemd service for continuous execution:
+
+1. **Create a systemd service file**:
+   ```bash
+   sudo nano /etc/systemd/system/webmin-monitor.service
+   ```
+
+2. **Add the following content to the service file**:
+   ```ini
+   [Unit]
+   Description=Webmin Domain and SSL Monitoring Script (Continuous)
+   After=network.target
+
+   [Service]
+   Type=simple
+   User=your-username
+   WorkingDirectory=/path/to/your/script/
+   ExecStart=/usr/bin/python3 /path/to/your/script/monitor_domains.py
+   Restart=always
+   RestartSec=10
+   EnvironmentFile=/path/to/your/script/.env
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+   - Replace `your-username` with your system username.
+   - Replace `/path/to/your/script/` with the actual path where the script is located.
+   - Replace `/usr/bin/python3` with the path to your Python interpreter.
+
+3. **Enable and start the service**:
+   ```bash
+   sudo systemctl enable webmin-monitor.service
+   sudo systemctl start webmin-monitor.service
+   ```
+
+4. **Check the status of the service**:
+   ```bash
+   sudo systemctl status webmin-monitor.service
+   ```
+### Improved Error Handling
+
+- **Custom Error Classes**: 
+  - The script uses custom error classes (`WebminAuthError`, `WebminServerError`, `WebminConnectionError`) for more specific error handling.
+  - This helps to differentiate between authentication errors, server errors, and connection issues, making troubleshooting easier.
+- **Persistent Error Alerts**: 
+  - If a specific error (e.g., unauthorized access) occurs repeatedly beyond the `ERROR_ALERT_THRESHOLD`, the script sends an email alert.
+  - The interval between alerts is controlled by the `ERROR_ALERT_INTERVAL` variable.
+
+## Usage
+
+To run the script, use the following command:
+
+```bash
+python monitor_domains.py
+```
+
+If using continuous mode, the script will run indefinitely, checking for domain and SSL expiration at regular intervals.
+
+### Additional Information
+
+- **Dependencies**: Ensure you have the required dependencies installed by running:
+  ```bash
+  pip install -r requirements.txt
+  ```
+- **Logs**: Check the log file (`webmin_domains.log`) for detailed logs of activities and errors.
 
 ## Author
 
