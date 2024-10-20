@@ -89,6 +89,7 @@ EMAIL_TEMPLATE_PLAIN=email_plain.j2 # Jinja2 template for plain-text email alert
 # Interval in seconds between runs in continuous mode
 CHECK_INTERVAL=86400              # Default interval: 24 hours
 ```
+> **Note:** The `domains.txt` file does not need to exist before the first run of the script; it will be created automatically based on the retrieved domains.
 
 ### Additional Information on Configuration Variables
 
@@ -111,6 +112,12 @@ CHECK_INTERVAL=86400              # Default interval: 24 hours
   - The `TEMPLATE_DIR` variable specifies where the Jinja2 templates are located. Ensure this path is correct to avoid errors when sending email alerts.
 - **Customizable Email Templates**:
   - Modify `EMAIL_TEMPLATE_HTML` and `EMAIL_TEMPLATE_PLAIN` to change the content of email alerts. These templates use Jinja2 for dynamic content rendering, allowing you to customize the email layout and information.
+ 
+#### Note About Setting Up Environment Variables
+
+Ensure the `.env` file contains all the required variables listed in the **Configuration** section. The script checks for the existence of these variables and will exit with an error if any are missing.
+
+> **Important:** Set these variables before the first run to avoid errors. Use the `.env` file to store and manage these variables securely.
 
 ## Running the Script
 
@@ -242,11 +249,32 @@ The script will now run as a continuous service, restarting automatically if it 
 
 ## Additional Information
 
-- **Dependencies**: Ensure you have the required dependencies installed by running:
-  ```bash
-  pip install -r requirements.txt
-  ```
-- **Logs**: Check the log file (`webmin_domains.log`) for detailed logs of activities and errors.
+### Dependencies
+
+To ensure you have all the necessary Python packages, use the `requirements.txt` file to install dependencies. Run the following command:
+
+```bash
+pip install -r requirements.txt
+```
+
+The expected dependencies include:
+- `requests`
+- `python-dotenv`
+- `tenacity`
+- `jinja2`
+- `smtplib` (built-in)
+
+> **Unsupported Recommendation for Python Experienced Users:**
+> Use a virtual environment to manage dependencies and prevent conflicts with other Python projects. To create and activate a virtual environment, run:
+> ```bash
+> python3 -m venv venv
+> source venv/bin/activate  # On Windows: venv\Scripts\activate
+> pip install -r requirements.txt
+> ```
+
+### Logs
+
+Check the log file (`webmin_domains.log`) for detailed logs of activities and errors.
 
 ## Author
 
