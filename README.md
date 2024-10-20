@@ -389,7 +389,7 @@ The expected dependencies include:
 - `jinja2`
 - `smtplib` (built-in)
 
-> **Unsupported Recommendation for Python Experienced Users:**
+> **(Optional) Recommendation for Python Experienced Users:**
 > Use a virtual environment to manage dependencies and prevent conflicts with other Python projects. To create and activate a virtual environment, run:
 > ```bash
 > python3 -m venv venv
