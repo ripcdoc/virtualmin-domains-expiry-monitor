@@ -1,4 +1,4 @@
-# Webmin Domain and SSL Monitoring Script
+# Webmin/Virtualmin Domain and SSL Monitoring Script
 
 ![Expiry Monitor Logo](expiry-monitor-logo.webp)
 
@@ -55,6 +55,8 @@ pip install -r requirements.txt
 
 ## Installation
 
+### Option 1: Clone the Repository
+
 1. **Clone the repository:**
 
     ```bash
@@ -72,27 +74,59 @@ pip install -r requirements.txt
 
     Create a `.env` file in the root directory using the template provided below.
 
+### Option 2: Manual Download
+
+If you prefer to manually download the script instead of cloning the GitHub repository, follow these steps:
+
+1. **Download the script:**
+   - Go to the GitHub repository page: [virtualmin-domains-expiry-monitor](https://github.com/ripcdoc/virtualmin-domains-expiry-monitor).
+   - Click on the script file(s) and use the "Download" button to save them to your local system.
+
+2. **Install the prerequisites:**
+   - Make sure you have Python 3.6+ installed.
+   - Install the required Python packages using pip:
+
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+   - You can create a `requirements.txt` file yourself with the following content:
+
+     ```
+     python-dotenv
+     requests
+     tenacity
+     smtplib
+     ```
+
+3. **Set up the `.env` file:**
+   - Create a new file named `.env` in the same directory as the script and use the following template:
+
+     ```env
+     WEBMIN_SERVERS=https://webmin1.example.com,https://webmin2.example.com,https://webmin3.example.com
+     WEBMIN_API_KEYS=api_key1,api_key2,api_key3
+     EMAIL_HOST=smtp.example.com
+     EMAIL_PORT=587
+     EMAIL_USER=email@example.com
+     EMAIL_PASSWORD=your-email-password
+     EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com
+     DOMAIN_FILE=domains.txt
+     SSL_ALERT_DAYS=15
+     DOMAIN_EXPIRATION_ALERT_DAYS=45
+     MAX_RETRIES=3
+     RETRY_WAIT=5
+     LOG_FILE=webmin_domains.log
+     ```
+
+4. **Run the script:**
+
+    To run the script manually:
+
+    ```bash
+    python monitor_domains.py
+    ```
+
 ## Configuration
-
-### Environment Variables
-
-Create a `.env` file with the following variables:
-
-```env
-WEBMIN_SERVERS=https://webmin1.example.com,https://webmin2.example.com,https://webmin3.example.com
-WEBMIN_API_KEYS=api_key1,api_key2,api_key3
-EMAIL_HOST=smtp.example.com
-EMAIL_PORT=587
-EMAIL_USER=email@example.com
-EMAIL_PASSWORD=your-email-password
-EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com
-DOMAIN_FILE=domains.txt
-SSL_ALERT_DAYS=15
-DOMAIN_EXPIRATION_ALERT_DAYS=45
-MAX_RETRIES=3
-RETRY_WAIT=5
-LOG_FILE=webmin_domains.log
-```
 
 ### Setting Up Webmin API Users and API Keys
 
@@ -115,14 +149,6 @@ LOG_FILE=webmin_domains.log
 
 5. **Test the configuration:**
    - Run the script to verify it fetches domains from each Webmin server using the API keys.
-
-## Running the Script
-
-To run the script manually:
-
-```bash
-python monitor_domains.py
-```
 
 ## Automating the Script Execution
 
