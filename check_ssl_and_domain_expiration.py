@@ -64,6 +64,9 @@ TEMPLATE_DIR = os.getenv('TEMPLATE_DIR', './templates')
 EMAIL_TEMPLATE_HTML = os.getenv('EMAIL_TEMPLATE_HTML', 'email_html.j2')
 EMAIL_TEMPLATE_PLAIN = os.getenv('EMAIL_TEMPLATE_PLAIN', 'email_plain.j2')
 
+# Continuous loop configuration
+CHECK_INTERVAL = int(os.getenv('CHECK_INTERVAL', 86400))  # Default: 24 hours
+
 # Configure logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -292,5 +295,17 @@ def main():
     all_domains = list(set(all_domains))
     update_domains_file(all_domains)
 
+# Uncomment the following lines to enable continuous loop mode
+# def continuous_loop():
+#     """
+#     Runs the monitoring tasks in a continuous loop with a delay between runs.
+#     """
+#     while True:
+#         main()
+#         logger.info(f"Sleeping for {CHECK_INTERVAL} seconds before the next run.")
+#         time.sleep(CHECK_INTERVAL)
+
 if __name__ == "__main__":
-    main()
+    main()  # Default single-run mode
+    # Uncomment the line below to enable continuous loop mode
+    # continuous_loop()
