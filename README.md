@@ -13,8 +13,8 @@ This Python script monitors SSL certificate expirations and domain registration 
 - **Domain Registration Expiration Monitoring**: Tracks domain registration expiration dates and sends notifications when they approach expiration.
 - **Email Alerts**: Sends alerts to specified email recipients regarding SSL and domain registration expirations.
 - **Rotating Log File**: All actions, including successful checks and errors, are logged in a rotating log file.
-- **Configurable Configuration**: Uses environment variables for easy customization.
-- **Automated Execution**: Supports scheduling via cron job for regular checks.
+- **Simple End-User Configuration**: Uses environment variables for easy configuration.
+- **Automated Execution**: Supports scheduling via cron job for regular checks (could be modified to run as a `systemd` service).
 
 ## Why Use This Script?
 
@@ -72,7 +72,7 @@ pip install -r requirements.txt
 
 3. **Set up the `.env` file:**
 
-    Create a `.env` file in the root directory using the template provided below.
+    Create a `.env` file in the root directory using the template provided in the included `env.sample` file.
 
 ### Option 2: Manual Download
 
@@ -193,7 +193,7 @@ Logs are stored in a rotating log file specified by the `LOG_FILE` variable in t
 ## Author
 
 - **Dr. Peter O'Hara-Diaz**
-- Contact: [ripcdoc@example.com](mailto:ripcdoc@example.com)
+- Contact: [po@floodgatetech.com](mailto:po@floodgatetech.com)
 
 ## License
 
