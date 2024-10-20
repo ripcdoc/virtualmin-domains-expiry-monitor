@@ -256,19 +256,3 @@ The script will now run as a continuous service, restarting automatically if it 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-### Side-by-Side Comparison
-
-| **Original README** | **Modified README** |
-|-------------------------------|-----------------------------|
-| **Title:** Webmin Domain Registration and SSL Expiry Monitoring Script with Jinja2 Templated Email Alerts and Comprehensive Error Handling with Persistent Alerts. | **Title:** Webmin Domain and SSL Expiry Monitoring Script with Jinja2 Templated Alerts & Comprehensive Error Handling |
-| **Overview:** The current overview describes the script's main functions but doesn't specify single-run and continuous execution modes or the retry mechanism with exponential backoff. | **Overview:** Added descriptions of single-run and continuous execution modes, along with the retry mechanism and exponential backoff. |
-| **Features:** Existing features were already comprehensive but lacked specific mention of dynamic worker allocation. | **Features:** Added bullet point about dynamic worker allocation. Enhanced explanation of continuous execution mode. |
-| **Configuration:** The original had all necessary variables but lacked a warning about `.env` security. | **Configuration:** Added a warning about `.env` file security, a new subheading, and more details about template customization. |
-| **Running the Script:** The original version lacked specific commands and guidance for enabling continuous mode. | **Running the Script:** Added a "Commands Summary" section, clearer guidance for switching to continuous mode, and a note about cron job setup. |
-| **Improved Error Handling:** Original covered persistent alerts and error handling but missed details about logging and retry mechanism. | **Improved Error Handling:** Expanded to include enhanced logging details, retry mechanism, and examples of error handling in action. |
-| **Additional Information:** Covered dependencies and logs briefly. | **Additional Information:** Expanded instructions for checking logs and installing dependencies, emphasizing correct `.env` configuration. |
-
-This modified version adds clarity, improves structure, and aligns more closely with the script's features and functionality. Let me know if you have further suggestions or requests!
