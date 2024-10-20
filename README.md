@@ -284,6 +284,9 @@ The script will now run as a continuous service, restarting automatically if it 
 
 The script uses Jinja2 templates to generate both HTML and plaintext email alerts. These templates ensure that notifications are informative, actionable, and easily customizable. 
 
+> **Important Note:** 
+> Ensure that you do not replace the default templates (`email_html.j2` and `email_plain.j2`). If you want to customize the templates, create copies with new names (e.g., `custom_email_html.j2`) and specify the new names in the `.env` file. This ensures that the script has fallback templates available and prevents errors if custom templates are not configured correctly.
+
 ### Default Templates
 
 The script includes two default templates:
