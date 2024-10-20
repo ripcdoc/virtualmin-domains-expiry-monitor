@@ -248,6 +248,86 @@ The script will now run as a continuous service, restarting automatically if it 
   - If the script encounters an authentication error while connecting to a Webmin server, it logs the error, triggers retries (if configured), and sends a persistent alert if the issue continues beyond the defined threshold.
   - Similarly, in the case of server-side errors (e.g., HTTP 500), the script logs the error, retries the connection, and triggers an alert if the problem persists.
 
+## Customizing Jinja2 Email Templates
+
+The script uses Jinja2 templates to generate both HTML and plaintext email alerts. These templates ensure that notifications are informative, actionable, and easily customizable. 
+
+### Default Templates
+
+The script includes two default templates:
+1. **HTML Template** (`email_html.j2`): This template creates a styled email with HTML formatting.
+2. **Plaintext Template** (`email_plain.j2`): This template generates a simple, plain-text version of the email for recipients who prefer or require non-HTML emails.
+
+Both templates are located in the **template directory** specified by the `TEMPLATE_DIR` environment variable in your `.env` file. By default, this directory is set to `./templates`.
+
+### Structure of the Templates
+
+#### HTML Template (`email_html.j2`)
+
+The HTML template includes:
+- **Logo Placeholder**: An image placeholder at the top of the email, which you can replace with your logo by updating the `src` attribute of the `<img>` tag.
+  ```html
+  <img src="https://example.com/logo.png" alt="Webmin Monitor Logo">
+  ```
+  Replace `https://example.com/logo.png` with the URL to your actual logo image.
+
+- **Subject Line**: Uses the `{{ subject }}` variable to display the email subject dynamically.
+  ```html
+  <h1>{{ subject }}</h1>
+  ```
+
+- **Dynamic Content**: Variables like `{{ domain }}`, `{{ expiration_type }}`, and `{{ days_until_expire }}` are used to display domain-specific details.
+  - `{{ expiration_type }}` determines whether the alert is for SSL expiration or domain registration expiration, with conditional content to guide the user on next steps.
+  - `{{ days_until_expire }}` indicates the number of days remaining before the expiration event.
+
+- **Support and Footer Links**: The template includes a link to the support page and a copyright notice. Update these links to match your organization’s actual support page and website.
+
+#### Plaintext Template (`email_plain.j2`)
+
+The plaintext template includes:
+- **Basic Structure**: Simple text layout with variables like `{{ domain }}`, `{{ expiration_type }}`, and `{{ days_until_expire }}`.
+- **Support and Footer Links**: Plain URLs are provided for easy navigation. Update the URLs to point to your actual support page and website.
+
+### Modifying the Templates
+
+1. **Edit the Template Files**: 
+   - Open the template files (`email_html.j2` and `email_plain.j2`) in a text editor.
+   - Make adjustments to the HTML structure, text content, or variables as needed.
+   - Save the files in the directory specified by the `TEMPLATE_DIR` environment variable.
+
+2. **Add New Variables (Optional)**:
+   - If you need additional variables for more context or details in your alerts, modify the script to pass new variables to the templates. 
+   - Update the template files to use these new variables by adding placeholders like `{{ new_variable }}`.
+
+3. **Test Changes**:
+   - After modifying the templates, run the script in a test environment to ensure the emails are formatted correctly and include the intended information.
+   - Check both the HTML and plaintext versions to confirm that the changes apply as expected.
+
+### Example Template Modification
+
+Here’s an example of modifying the HTML template to include a custom message:
+
+1. **Locate this section in the `email_html.j2` file**:
+   ```html
+   <p>For more information or assistance, please visit our <a href="https://example.com/support">Support Page</a>.</p>
+   ```
+
+2. **Replace it with a custom message**:
+   ```html
+   <p>If you need urgent assistance, please contact our support team at <a href="mailto:support@example.com">support@example.com</a>.</p>
+   ```
+
+### Template Directory
+
+Ensure that your template files are stored in the directory specified by the `TEMPLATE_DIR` environment variable. By default, the script will look for templates in `./templates`, but you can change this path in the `.env` file to point to a different location.
+
+### Troubleshooting
+
+If the script fails to load a template or sends an incomplete email:
+- **Check the template file path**: Ensure that `TEMPLATE_DIR` points to the correct directory.
+- **Verify template syntax**: Ensure that the Jinja2 syntax in the templates is valid and matches the variable names passed by the script.
+- **Review logs**: Check the `webmin_domains.log` file for errors related to template rendering or email sending.
+
 ## Additional Information
 
 ### Dependencies
