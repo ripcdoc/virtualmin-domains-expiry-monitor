@@ -42,7 +42,7 @@ Sets parameters for SSL certificate (`SSL_ALERT_DAYS`) and domain registration (
 
 Configures a logger that writes messages to a log file (`webmin_domains.log`) with rotating capabilities to avoid excessive growth of log files.
 
-4. ** Maintain Master List of Domains (Across Multiple Webmin Hosts):**
+4. **Maintain Master List of Domains**
 
 Uses Webmin API to fetch the list of domains for each configured Webmin server.
 Errors during this process are logged.
