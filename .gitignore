@@ -172,4 +172,10 @@ Thumbs.db
 *.bak
 *.swp
 
+# Template files
+/templates/*
+!/templates/
+!/templates/email_html.j2
+!/templates/email_plain.j2
+
 # Secrets or sensitive files (add here if any exist)
