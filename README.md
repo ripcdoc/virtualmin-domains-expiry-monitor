@@ -40,6 +40,46 @@ This Python script is designed to help administrators monitor the **expiration o
 
 5. **Logging and Error Handling**:
    - All events and errors are logged in a rotating log file (`webmin_domains.log`) for easy monitoring and troubleshooting.
+  
++-------------------------------------------+
+|        Webmin Domain & SSL Monitor        |
++-------------------------------------------+
+                |
+                v
++-------------------------------------------+
+|  1) Fetch Domain List from Webmin API     |
+|     - Connect to Webmin servers           |
+|     - Retrieve domain list                |
++-------------------------------------------+
+                |
+                v
++-------------------------------------------+
+|  2) Update Local Domain File (domains.txt)|
+|     - Add new domains                     |
+|     - Remove deleted domains              |
++-------------------------------------------+
+                |
+                v
++-------------------------------------------+
+|  3) Check SSL Certificate Expiration      |
+|     - Use OpenSSL to check expiration     |
+|     - Alert if SSL expires within 15 days |
++-------------------------------------------+
+                |
+                v
++-------------------------------------------+
+|  4) Check Domain Registration Expiration  |
+|     - Use WHOIS to check expiration       |
+|     - Alert if domain expires within 45   |
+|       days                                |
++-------------------------------------------+
+                |
+                v
++-------------------------------------------+
+|  5) Log Results                           |
+|     - Log warnings and errors to file     |
+|     - Log changes to domain file          |
++-------------------------------------------+
 
 ## Requirements
 
