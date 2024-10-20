@@ -4,16 +4,17 @@
 
 ## Overview
 
-This Python script is designed to help administrators monitor the **expiration of SSL certificates** and **domain registrations** for domains managed by **Webmin/Virtualmin servers**. The script interacts with the Webmin API, fetches the list of domains, checks their SSL and domain registration expiration dates, and logs warnings if they are close to expiry. It also updates a local file (`domains.txt`) to keep track of current domains and logs any changes.
+This Python script is designed to help administrators monitor the expiration of SSL certificates and domain registrations for domains managed by Webmin/Virtualmin servers. The script interacts with the Webmin API, fetches the list of domains, checks their SSL and domain registration expiration dates, and logs warnings if they are close to expiry. It also updates a local file (`domains.txt`) to keep track of current domains and logs any changes.
 
 ## Features
 
 - **Fetch Domain List from Webmin API**: Automatically retrieves the list of domains from one or more Webmin servers using the Webmin API.
-- **SSL Certificate Expiration Check**: Checks the SSL certificate expiration date for each domain and logs a warning if the certificate is within 15 days of expiration.
-- **Domain Registration Expiration Check**: Verifies the domain registration expiration and logs a warning if the registration is within 45 days of expiration.
+- **SSL Certificate Expiration Check**: Checks the SSL certificate expiration date for each domain and logs a warning if the certificate is within a configurable number of days (default is 15 days).
+- **Domain Registration Expiration Check**: Verifies the domain registration expiration and logs a warning if the registration is within a configurable number of days (default is 45 days).
 - **Automatic Domain Management**: Updates the local domain file (`domains.txt`) by adding new domains and removing deleted ones.
+- **Email Notifications**: Sends email notifications to configured recipients if SSL certificates or domains are about to expire.
+- **Configurable**: Uses environment variables for easy customization.
 - **Logging**: Logs all events, including SSL and domain checks, additions, and removals, as well as any errors encountered during execution.
-- **Configurable**: Easily configure Webmin server URLs, API credentials, and alert thresholds.
 
 ## Why Use This Script?
 
@@ -22,155 +23,147 @@ This Python script is designed to help administrators monitor the **expiration o
 - **Flexible and Extendable**: The Python script is written in a modular way, making it easy to customize for specific needs or to add additional features.
 - **Simple to Use**: With basic Python knowledge, users can easily set up and run this script, making it a valuable tool for administrators managing Webmin servers.
 
-## How It Works
+## Prerequisites
 
-**MAIN EXECUTION FLOW:**
+Before using the script, make sure you have the following prerequisites:
 
-Fetches domains from each Webmin server, removes duplicates, and updates the domain file.
-Reads the updated domain list from the file and checks SSL and domain expiration for each domain.
-
-1. **Imports Necessary Modules:**
-
-Imports several Python modules required for network interaction (requests), subprocesses (subprocess), logging (logging), file operations (os), and date-time calculations (datetime).
-
-2. **Configurations:**
-
-Configures a list of Webmin servers (`webmin_servers`), along with their credentials (`webmin_users` and `webmin_passwords`).
-Sets parameters for SSL certificate (`SSL_ALERT_DAYS`) and domain registration (`DOMAIN_EXPIRATION_ALERT_DAYS`) expiry notifications.
-
-3. **Logging Setup:**
-
-Configures a logger that writes messages to a log file (`webmin_domains.log`) with rotating capabilities to avoid excessive growth of log files.
-All events and errors are logged in a rotating log file for easy monitoring and troubleshooting.
-
-4. **Maintain Master List of Domains:**
-
-Uses Webmin API to fetch the list of domains for each configured Webmin server.
-Errors during this process are logged.
-Updates a text file (`domains.txt`) containing the list of domains fetched from the Webmin servers.
-
-5. **Check SSL Expiration:**
-
-Uses `openssl` to check the SSL certificate of each domain and calculates the days remaining until expiry.
-Logs a warning if the SSL certificate will expire soon (<= `SSL_ALERT_DAYS` days).
-
-6. **Check Domain Registration Expiration:**
-
-Uses the `whois` command to check the domain registration expiry date.
-Logs a warning if the domain registration will expire soon (<= `DOMAIN_EXPIRATION_ALERT_DAYS` days).
-  
-+-------------------------------------------+
-|        Webmin Domain & SSL Monitor        |
-+-------------------------------------------+
-
-+-------------------------------------------+
-|  1) Fetch Domain List from Webmin API     |
-|     - Connect to Webmin servers           |
-|     - Retrieve domain list                |
-+-------------------------------------------+
-                     |
-                     v
-+-------------------------------------------+
-|  2) Update Local Domain File (domains.txt)|
-|     - Add new domains                     |
-|     - Remove deleted domains              |
-+-------------------------------------------+
-                     |
-                     v
-+-------------------------------------------+
-|  3) Check SSL Certificate Expiration      |
-|     - Use OpenSSL to check expiration     |
-|     - Alert if SSL expires within 15 days |
-+-------------------------------------------+
-                     |
-                     v
-+-------------------------------------------+
-|  4) Check Domain Registration Expiration  |
-|     - Use WHOIS to check expiration       |
-|     - Alert if domain expires within 45   |
-|       days                                |
-+-------------------------------------------+
-                     |
-                     v
-+-------------------------------------------+
-|  5) Log Results                           |
-|     - Log warnings and errors to file     |
-|     - Log changes to domain file          |
-+-------------------------------------------+
-
-## Requirements
-
-- Python 3
-- `requests` library (`pip3 install requests`)
-- OpenSSL (`sudo apt install openssl`)
-- WHOIS utility (`sudo apt install whois`)
+1. **Python 3.6+**: Ensure Python is installed on your machine. You can check this by running:
+   ```bash
+   python --version
+   ```
+2. **pip**: Python's package installer. You can install it by following the [official guide](https://pip.pypa.io/en/stable/installation/).
+3. **WHOIS Tool**: This script relies on the `whois` command line utility to check domain registrations. Make sure it is installed on your system.
+   - **Ubuntu/Debian**:
+     ```bash
+     sudo apt-get install whois
+     ```
+   - **CentOS/RHEL**:
+     ```bash
+     sudo yum install whois
+     ```
+4. **OpenSSL**: Required for checking SSL certificates.
+   - **Ubuntu/Debian**:
+     ```bash
+     sudo apt-get install openssl
+     ```
+   - **CentOS/RHEL**:
+     ```bash
+     sudo yum install openssl
+     ```
+5. **SMTP Access**: Ensure that SMTP credentials are available to allow the script to send email alerts.
 
 ## Installation
 
-1. **Clone the repository**:
+1. Clone the repository or download the script to your local machine.
    ```bash
-   git clone https://github.com/yourusername/webmin-domain-ssl-monitor.git
-   cd webmin-domain-ssl-monitor
+   git clone https://github.com/ripcdoc/virtualmin-domains-expiry-monitor.git
+   cd virtualmin-domains-expiry-monitor
+   ```
+2. Install required Python packages using the `requirements.txt` file.
+   ```bash
+   pip install -r requirements.txt
    ```
 
-2. **Install required Python dependencies**:
-   ```bash
-   pip3 install requests
-   ```
+## Environment Configuration
 
-3. **Edit the script to set up your Webmin server credentials and settings**:
-   - Open `check_ssl_and_domain_expiration.py` and modify the following variables:
-     ```python
-     webmin_servers = ["http://server1:10000", "http://server2:10000"]
-     webmin_users = ["username1", "username2"]
-     webmin_passwords = ["password1", "password2"]
-     ```
-   - Adjust the SSL and domain expiration alert thresholds if needed:
-     ```python
-     SSL_ALERT_DAYS = 15
-     DOMAIN_EXPIRATION_ALERT_DAYS = 45
-     ```
+The script relies on environment variables for configuration. You need to create a `.env` file in the same directory as the script with the following variables:
 
-4. **Run the script**:
-   ```bash
-   python3 check_ssl_and_domain_expiration.py
-   ```
+### `.env` File Example
+```env
+# Webmin Configuration
+WEBMIN_SERVERS=http://server1:10000,http://server2:10000
+WEBMIN_USERS=username1,username2
+WEBMIN_PASSWORDS=password1,password2
 
-5. **(Optional) Set up a daily cron job**:
-   - If you want to run the script daily, add a cron job:
-     ```bash
-     crontab -e
-     ```
-   - Add the following line to run the script daily at midnight:
-     ```bash
-     0 0 * * * /usr/bin/python3 /path/to/check_ssl_and_domain_expiration.py
-     ```
+# SSL and Domain Expiration Configuration
+DOMAIN_FILE=domains.txt
+SSL_ALERT_DAYS=15
+DOMAIN_EXPIRATION_ALERT_DAYS=45
 
-## Configuration
+# Logging Configuration
+LOG_FILE=webmin_domains.log
 
-### Webmin API Access
-- Ensure that Webmin`s API is enabled on each server and that the API user has permission to list domains.
-- API access is set up via basic authentication. Ensure the user credentials are kept secure.
+# Email Configuration
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_USER=your-email@example.com
+EMAIL_PASSWORD=your-email-password
+EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com
+EMAIL_SUBJECT_ssl_expiration=SSL Certificate Expiration Alert for {domain}
+EMAIL_MESSAGE_ssl_expiration=The SSL certificate for domain {domain} will expire soon. Please take action.
+EMAIL_SUBJECT_domain_expiration=Domain Registration Expiration Alert for {domain}
+EMAIL_MESSAGE_domain_expiration=The domain {domain} will expire soon. Please renew it.
+```
 
-### Adjusting Alert Thresholds
-- You can modify the number of days for SSL and domain expiration alerts by changing the values of `SSL_ALERT_DAYS` and `DOMAIN_EXPIRATION_ALERT_DAYS` at the top of the script.
+## Usage
+
+To run the script, use the following command:
+```bash
+python check_ssl_and_domain_expiration.py
+```
+The script will:
+- Fetch domains from the configured Webmin servers.
+- Check SSL and domain registration expiration.
+- Log relevant information and send email alerts as necessary.
+
+## Important Notes
+
+- Make sure all environment variables are properly configured in the `.env` file.
+- If any required variable is missing, the script will log an error and exit.
+- Ensure that `whois` and `openssl` tools are installed and accessible in your system's PATH.
+
+## Error Handling
+
+- The script includes checks for missing environment variables and will log an error and stop execution if any are missing.
+- If SMTP credentials are incorrect, the email alert will fail. Ensure that all SMTP-related variables are properly configured.
+
+## Logging
+
+- Logs are written to a rotating file specified by the `LOG_FILE` environment variable.
+- Logging levels can be adjusted directly in the script if necessary.
+
+## Example Configurations
+
+### `.env.sample`
+Create a file named `.env` from the example `.env.sample` provided below:
+```env
+# Webmin Configuration
+WEBMIN_SERVERS=http://server1:10000,http://server2:10000
+WEBMIN_USERS=username1,username2
+WEBMIN_PASSWORDS=password1,password2
+
+# SSL and Domain Expiration Configuration
+DOMAIN_FILE=domains.txt
+SSL_ALERT_DAYS=15
+DOMAIN_EXPIRATION_ALERT_DAYS=45
+
+# Logging Configuration
+LOG_FILE=webmin_domains.log
+
+# Email Configuration
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_USER=your-email@example.com
+EMAIL_PASSWORD=your-email-password
+EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com
+EMAIL_SUBJECT_ssl_expiration=SSL Certificate Expiration Alert for {domain}
+EMAIL_MESSAGE_ssl_expiration=The SSL certificate for domain {domain} will expire soon. Please take action.
+EMAIL_SUBJECT_domain_expiration=Domain Registration Expiration Alert for {domain}
+EMAIL_MESSAGE_domain_expiration=The domain {domain} will expire soon. Please renew it.
+```
 
 ## Troubleshooting
 
-- **Script Fails to Fetch Domains**: 
-  - Check if the Webmin API is enabled and accessible from the server running the script.
-  - Ensure the credentials are correct and have necessary permissions.
-
-- **SSL or WHOIS Errors**: 
-  - Ensure that OpenSSL and the WHOIS utility are installed and accessible from the command line.
-  - Check if the domain in question has a valid SSL certificate and WHOIS data available.
-
-- **Logging Issues**:
-  - Ensure that the log file`s directory is writable. Adjust permissions or change the logging path if needed.
-
-## Author
-
-Created by **Dr. Peter O`Hara-Diaz**. This script is intended for use by system administrators to simplify the monitoring of SSL and domain expiration on Webmin-managed servers.
+1. **SMTP Issues**:
+   - Verify that your SMTP credentials are correct.
+   - Ensure that your email provider allows third-party applications to send emails.
+2. **WHOIS Command Issues**:
+   - If the WHOIS command isn't working, ensure it is installed and accessible in the system's PATH.
+3. **OpenSSL Issues**:
+   - Make sure that OpenSSL is installed and accessible for SSL checks.
+4. **Script Fails to Fetch Domains**:
+   - Check if the Webmin API is enabled and accessible from the server running the script.
+   - Ensure the credentials are correct and have necessary permissions.
 
 ## License
 
@@ -179,6 +172,14 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Contributions
 
 Feel free to fork the repository, open issues, or submit pull requests to improve the script. All contributions are welcome!
+
+## Author
+
+Created by Dr. Peter O'Hara-Diaz. Contributions and feedback are welcome!
+
+## Contact
+
+For support, please contact [po@floodgatetech.com].
 
 ## Disclaimer
 
