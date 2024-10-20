@@ -35,28 +35,28 @@ Imports several Python modules required for network interaction (requests), subp
 
 2. **Configurations:**
 
-Configures a list of Webmin servers ('webmin_servers'), along with their credentials ('webmin_users' and 'webmin_passwords').
-Sets parameters for SSL certificate ('SSL_ALERT_DAYS') and domain registration ('DOMAIN_EXPIRATION_ALERT_DAYS') expiry notifications.
+Configures a list of Webmin servers (`webmin_servers`), along with their credentials (`webmin_users` and `webmin_passwords`).
+Sets parameters for SSL certificate (`SSL_ALERT_DAYS`) and domain registration (`DOMAIN_EXPIRATION_ALERT_DAYS`) expiry notifications.
 
 3. **Logging Setup:**
 
-Configures a logger that writes messages to a log file ('webmin_domains.log') with rotating capabilities to avoid excessive growth of log files.
+Configures a logger that writes messages to a log file (`webmin_domains.log`) with rotating capabilities to avoid excessive growth of log files.
 
 4. ** Maintain Master List of Domains (Across Multiple Webmin Hosts):**
 
 Uses Webmin API to fetch the list of domains for each configured Webmin server.
 Errors during this process are logged.
-Updates a text file ('domains.txt') containing the list of domains fetched from the Webmin servers.
+Updates a text file (`domains.txt`) containing the list of domains fetched from the Webmin servers.
 
 5. **Check SSL Expiration:**
 
-Uses 'openssl' to check the SSL certificate of each domain and calculates the days remaining until expiry.
-Logs a warning if the SSL certificate will expire soon (<= 'SSL_ALERT_DAYS' days).
+Uses `openssl` to check the SSL certificate of each domain and calculates the days remaining until expiry.
+Logs a warning if the SSL certificate will expire soon (<= `SSL_ALERT_DAYS` days).
 
 6. **Check Domain Registration Expiration:**
 
-Uses the 'whois' command to check the domain registration expiry date.
-Logs a warning if the domain registration will expire soon (<= 'DOMAIN_EXPIRATION_ALERT_DAYS' days).
+Uses the `whois` command to check the domain registration expiry date.
+Logs a warning if the domain registration will expire soon (<= `DOMAIN_EXPIRATION_ALERT_DAYS` days).
 
 1. **Fetches Domains from Webmin API**:
    - Connects to specified Webmin servers using the API and retrieves the list of managed domains.
@@ -65,7 +65,7 @@ Logs a warning if the domain registration will expire soon (<= 'DOMAIN_EXPIRATIO
    - Compares the fetched domain list with the existing local file and updates it by adding new domains and removing deleted ones.
 
 3. **Checks SSL Certificate Expiration**:
-   - Uses OpenSSL to check the expiration date of each domain's SSL certificate.
+   - Uses OpenSSL to check the expiration date of each domain`s SSL certificate.
    - Logs a warning if the SSL certificate expires within a specified number of days (default: 15 days).
 
 4. **Checks Domain Registration Expiration**:
@@ -165,7 +165,7 @@ Logs a warning if the domain registration will expire soon (<= 'DOMAIN_EXPIRATIO
 ## Configuration
 
 ### Webmin API Access
-- Ensure that Webmin's API is enabled on each server and that the API user has permission to list domains.
+- Ensure that Webmin`s API is enabled on each server and that the API user has permission to list domains.
 - API access is set up via basic authentication. Ensure the user credentials are kept secure.
 
 ### Adjusting Alert Thresholds
@@ -182,11 +182,11 @@ Logs a warning if the domain registration will expire soon (<= 'DOMAIN_EXPIRATIO
   - Check if the domain in question has a valid SSL certificate and WHOIS data available.
 
 - **Logging Issues**:
-  - Ensure that the log file's directory is writable. Adjust permissions or change the logging path if needed.
+  - Ensure that the log file`s directory is writable. Adjust permissions or change the logging path if needed.
 
 ## Author
 
-Created by **Dr. Peter O'Hara-Diaz**. This script is intended for use by system administrators to simplify the monitoring of SSL and domain expiration on Webmin-managed servers.
+Created by **Dr. Peter O`Hara-Diaz**. This script is intended for use by system administrators to simplify the monitoring of SSL and domain expiration on Webmin-managed servers.
 
 ## License
 
