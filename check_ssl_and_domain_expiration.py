@@ -246,4 +246,55 @@ def send_email(domain, expiration_type, days_until_expire, html=False):
         msg = MIMEMultipart("alternative")
         msg['Subject'] = subject
         msg['From'] = EMAIL_USER
-        msg['To'] = ", ".join(EMAIL_RECIPIENTS
+        msg['To'] = ", ".join(EMAIL_RECIPIENTS)
+
+        if html:
+            part = MIMEText(message, "html")
+        else:
+            part = MIMEText(message, "plain")
+        msg.attach(part)
+        
+        with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT) as smtp:
+            smtp.starttls()
+            smtp.login(EMAIL_USER, EMAIL_PASSWORD)
+            smtp.sendmail(EMAIL_USER, EMAIL_RECIPIENTS, msg.as_string())
+            logger.info("Email sent successfully.")
+    except Exception as e:
+        logger.error(f"Error sending email: {e}")
+
+# Main function to run the daily check
+# Main function to run the daily checks.
+def main():
+    """
+    Main function to execute the monitoring tasks.
+
+    - Fetches domains from the configured Webmin servers.
+    - Updates the local domain list.
+    - Runs SSL and domain registration checks in parallel.
+    """
+    all_domains = []
+
+    # Fetch domains from each Webmin server and update domains.txt
+    for i, webmin_url in enumerate(webmin_servers):
+        try:
+            domains = get_domains(webmin_url, webmin_users[i], webmin_passwords[i])
+            if domains:
+                all_domains.extend(domains)
+        except Exception as e:
+            logger.error(f"Failed to fetch domains from {webmin_url}: {e}")
+
+    # Remove duplicates and update the local domain file
+    all_domains = list(set(all_domains))
+    update_domains_file(all_domains)
+
+    # Run domain checks in parallel with dynamic thread allocation
+    if os.path.exists(DOMAIN_FILE):
+        with open(DOMAIN_FILE, "r") as f:
+            domains = [domain.strip() for domain in f if domain.strip()]
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            executor.map(check_ssl_expiration, domains)
+            executor.map(check_domain_expiration, domains)
+
+if __name__ == "__main__":
+    main()
