@@ -30,8 +30,12 @@ Provide any relevant log snippets that might help diagnose the issue.
  - OS: 
  - OS Version: 
  - Python Version: 
- - Have you verified all requirements and dependencies are met?: [ ] Yes [ ] No
- - Have you tried the latest version?: [ ] Yes [ ] No
+ - Have you verified all requirements and dependencies are met?
+  - [ ] Yes
+  - [ ] No
+ - Have you tried the latest version?
+  - [ ] Yes
+  - [ ] No
 
 **Additional context**
 Add any other context about the problem here.
