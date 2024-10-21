@@ -5,7 +5,7 @@ Below is a list of released versions and their support status:
 | Version | Status                        | Supported?         |
 | ------- | ----------------------------- | ------------------ |
 | v1.1.1  | Current - Actively Maintained | :white_check_mark: |
-| v1.1.0  | Supported - upgrade suggested | :white_check_mark: |
+| v1.1.0  | Upgrade to v1.1.1 suggested   | :white_check_mark: |
 | v1.0.8  | First Public Release Version  | :x:                |
 | v1.0.7  | Beta Release Version          | :x:                |
 
