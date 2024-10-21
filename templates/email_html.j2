@@ -52,7 +52,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="https://example.com/logo.png" alt="Webmin Monitor Logo">
+            <img src="{{ logo_url }}" alt="Webmin Monitor Logo">
         </div>
         <div class="content">
             <h1>{{ subject }}</h1>
@@ -66,13 +66,12 @@
             {% elif expiration_type == 'domain registration' %}
                 <p>The domain registration is nearing its expiration date. Please ensure that it is renewed promptly to avoid potential downtime or loss of ownership.</p>
             {% endif %}
-
-            <p>For more information or assistance, please visit our <a href="https://example.com/support">Support Page</a>.</p>
-
-            <p>Thank you for using Webmin Monitoring Script.</p>
+            
+            <p>For more information or assistance, please visit our <a href="{{ support_url }}">Support Page</a>.</p>
         </div>
         <div class="footer">
-            <p>&copy; 2024 Webmin Monitor. All rights reserved. <a href="https://example.com">Visit our website</a></p>
+            <p>© 2024 Webmin Monitor. All rights reserved.</p>
+            <p>Visit our website: <a href="{{ support_url }}">{{ support_url }}</a></p>
         </div>
     </div>
 </body>
