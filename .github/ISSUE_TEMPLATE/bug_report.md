@@ -1,9 +1,10 @@
+
 ---
 name: Bug report
 about: Create a report to help us improve
-title: "[BUG]"
-labels: 'bug'
-assignees: ripcdoc
+title: "[BUG] <Describe the bug>"
+labels: bug
+assignees: ''
 
 ---
 
@@ -23,21 +24,14 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Log Snippets**
-Provide any relevant log snippets that might help diagnose the issue.
+**Environment (please complete the following information):**
+ - OS: [e.g. Windows, MacOS, Linux]
+ - Python Version: [e.g. 3.8, 3.9, 3.10]
+ - Branch: [e.g. main, development]
+ - Additional context: Any other relevant information.
 
-**Environment Details**
- - OS: 
- - OS Version: 
- - Python Version:
-
-**Have you verified all requirements and dependencies are met?**
-  - [ ] Yes
-  - [ ] No
-
-**Have you tried the latest version?**
-  - [ ] Yes
-  - [ ] No
+**Logs or Console Output**
+Paste any relevant logs or console output here.
 
 **Additional context**
 Add any other context about the problem here.
