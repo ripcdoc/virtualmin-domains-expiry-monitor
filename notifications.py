@@ -1,42 +1,21 @@
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from jinja2 import Environment, FileSystemLoader
-
+from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from config import Config
-import logging
+from logger import setup_logger
 
-logger = logging.getLogger(__name__)
+logger = setup_logger()
 
-def prepare_email_context(expiration_type, domain, days_until_expire):
+
+def send_notification(subject, html_content, plain_content):
     """
-    Prepares the context for rendering email templates with common variables.
+    Sends an email notification.
 
-    Args:
-        expiration_type (str): Type of expiration (e.g., 'SSL' or 'domain registration').
-        domain (str): Domain name being monitored.
-        days_until_expire (int): Number of days until expiration.
-
-    Returns:
-        dict: Context data for email templates.
-    """
-    return {
-        'subject': f"{expiration_type.capitalize()} Expiration Alert: {domain}",
-        'expiration_type': expiration_type,
-        'domain': domain,
-        'days_until_expire': days_until_expire,
-        'logo_url': Config.LOGO_URL,
-        'support_url': Config.SUPPORT_URL
-    }
-
-def send_email(subject, html_content, plain_content):
-    """
-    Sends an email with the specified subject and content.
-    
     Args:
         subject (str): Subject of the email.
-        html_content (str): HTML content of the email.
-        plain_content (str): Plain text content of the email.
+        html_content (str): HTML formatted email content.
+        plain_content (str): Plain text formatted email content.
     """
     try:
         msg = MIMEMultipart("alternative")
@@ -54,10 +33,11 @@ def send_email(subject, html_content, plain_content):
     except smtplib.SMTPException as e:
         logger.error(f"Failed to send email: {e}")
 
+
 def render_email_template(template_name, context):
     """
     Renders an email template with the given context.
-    
+
     Args:
         template_name (str): The name of the template file.
         context (dict): Context data for template rendering.
@@ -69,23 +49,22 @@ def render_email_template(template_name, context):
         env = Environment(loader=FileSystemLoader(Config.TEMPLATE_DIR))
         template = env.get_template(template_name)
         return template.render(context)
+    except TemplateNotFound:
+        logger.error(f"Template '{template_name}' not found.")
+        return ""
     except Exception as e:
         logger.error(f"Error rendering template '{template_name}': {e}")
         return ""
 
-# Example function to demonstrate usage
-def notify_domain_expiration(expiration_type, domain, days_until_expire):
-    """
-    Sends a notification email about domain or SSL expiration.
 
-    Args:
-        expiration_type (str): Type of expiration (e.g., 'SSL' or 'domain registration').
-        domain (str): Domain name being monitored.
-        days_until_expire (int): Number of days until expiration.
-    """
-    context = prepare_email_context(expiration_type, domain, days_until_expire)
-    subject = context['subject']
+if __name__ == "__main__":
+    context = {
+        'subject': "Test Email Subject",
+        'domain': "example.com",
+        'days_until_expire': 10,
+        'logo_url': Config.LOGO_URL,
+        'support_url': Config.SUPPORT_URL
+    }
     html_content = render_email_template(Config.EMAIL_TEMPLATE_HTML, context)
     plain_content = render_email_template(Config.EMAIL_TEMPLATE_PLAIN, context)
-    
-    send_email(subject, html_content, plain_content)
+    send_notification(context['subject'], html_content, plain_content)
