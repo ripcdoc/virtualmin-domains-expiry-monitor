@@ -8,12 +8,21 @@ This Python script helps administrators monitor the expiration of SSL certificat
 
 It supports both single-run and continuous execution modes and can be set up as a systemd service or cron job for automated execution. The script includes error handling with retries and exponential backoff to manage network issues effectively.
 
+This script now uses a **modular design**, with different modules handling configuration, domain operations, notifications, and logging, enhancing maintainability and scalability. It also now handles additional domains not hosted on a Webmin server (user configurable via the `.env` file).
+
 ## Features
 
+- **Modular Architecture**: The script is structured into separate modules:
+  - **`config.py`**: Manages configuration loading from the `.env` file.
+  - **`domain_operations.py`**: Handles domain retrieval from Webmin servers and includes support for additional domains.
+  - **`notifications.py`**: Manages email alerts using Jinja2 templates.
+  - **`logger.py`**: Sets up centralized logging.
+  - **`domain_monitor.py`**: Acts as the main controller to orchestrate the workflow.
 - **Fetch Domain List from Webmin API**: Automatically retrieves the list of domains from one or more Webmin servers using the Webmin API.
 - **SSL Certificate Expiration Check**: Checks SSL certificate expiration dates and logs warnings if certificates are close to expiry.
 - **Domain Registration Expiration Check**: Verifies domain registration expiration dates and logs warnings if registrations are near expiry.
 - **Automatic Domain Management**: Updates the local domain file (`domains.txt`) by adding new domains and removing deleted ones.
+- **Support for Additional Domains**: Users can specify additional domains to be monitored by setting the `ADDITIONAL_DOMAINS` variable in the `.env` file.
 - **Customizable Email Alerts with Jinja2 Templates**: Sends HTML and plain-text email alerts using Jinja2 templates. Users can customize the templates (`email_html.j2` and `email_plain.j2`) to personalize email content for SSL and domain expiration notifications.
 - **Comprehensive Error Handling**: 
   - Uses custom error classes (`WebminAuthError`, `WebminServerError`, `WebminConnectionError`) to manage specific errors, helping to differentiate between authentication errors, server errors, and connection issues.
@@ -96,18 +105,14 @@ cd virtualmin-domains-expiry-monitor
        main()  # Default single-run mode
        # continuous_loop()  # Uncomment this line to enable continuous loop mode
    ```
-3. Modify as follows:
-   ```python
-   if __name__ == "__main__":
-       # main()  # Default single-run mode
-       continuous_loop()  # Uncomment this line to enable continuous loop mode
-   ```
-4. Save the script and run it:
+3. Uncomment the `continuous_loop()` line and comment out the `main()` line to switch to continuous mode.
+4. Uncomment the Continuous Loop Mode block as noted in the script comments.
+5. Save the script and run it:
    ```bash
    python monitor_domains.py
    ```
 
-### Step 7: (Optional) Set Up as a Systemd Service
+### Step 7: (Optional) Set Up as a Systemd Service if using Continuous Loop Mode
 
 1. Create a systemd service file:
    ```bash
@@ -139,7 +144,21 @@ cd virtualmin-domains-expiry-monitor
    sudo systemctl start webmin-monitor.service
    ```
 
-### Step 8: Review Logs and Monitor Alerts
+### Step 8: (Optional) Set Up as a Cron Job if using Single-Run Mode
+
+To run the script periodically in single-run mode, you can set up a cron job:
+
+1. **Open the crontab editor**:
+   ```bash
+   crontab -e
+   ```
+
+2. **Add a cron job entry**:
+   ```bash
+   0 2 * * * /usr/bin/python3 /path/to/your/script/domain_monitor.py >> /path/to/your/log/webmin_domains.log 2>&1
+   ```
+
+### Step 9: Review Logs and Monitor Alerts
 
 - Check the log file for any errors or warnings:
   ```bash
