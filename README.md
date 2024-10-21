@@ -47,13 +47,14 @@ This script now uses a **modular design**, with different modules handling confi
 ### Current Version: v2.0.0rc (Released on 2024-10-21)
 
 #### Notable Changes:
+- **CI/CD Integration**:
+  - **Implemented**: automated unit testing, static code analysis, multi-version compatibility checks, and test coverage reporting.
+  - **Multi-Version Testing**: now supports Python `3.8`, `3.9`, `3.10`, **`and 3.11`**, providing broader compatibility assurance.
 - **Dynamic Batch Size Calculation**: Automatically adjusts batch sizes based on API rate limits, processing time, and delay settings, offering improved scalability and performance.
 - **Enhanced Concurrency**: The new release optimizes parallel processing using threading, enabling faster domain monitoring for large lists.
 - **Advanced Error Handling**: Added custom exceptions and comprehensive try-catch blocks to improve robustness and error resilience across modules.
-- **CI/CD Integration**: Implemented automated unit testing, multi-version compatibility checks, static code analysis, and test coverage reporting.
 - **Improved Notification System**: Added support for logo URLs and support URLs in email templates, providing branded and informative alerts.
 - **Detailed Documentation**: Updated README, contributing guidelines, and environment variable descriptions for easier setup and configuration.
-
 > **For full details**, please see the [Release Notes](RELEASE_NOTES.md) and [Changelog](https://github.com/ripcdoc/virtualmin-domains-expiry-monitor/compare/v1.1.1...v2.0.0rc).
 
 ## Features
