@@ -1,15 +1,18 @@
-name: Code Coverage
+
+name: CI Pipeline
 
 on:
   push:
     branches:
       - main
+      - development
   pull_request:
     branches:
       - main
+      - development
 
 jobs:
-  test:
+  test-and-coverage:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the code
@@ -36,17 +39,6 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-name: CI Pipeline
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-jobs:
   run-unit-tests:
     runs-on: ubuntu-latest
     steps:
