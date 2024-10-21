@@ -31,6 +31,7 @@
 - [Additional Requirements](#additional-requirements)
 - [Webmin Configuration Details](#webmin-configuration-details)
 - [Author](#author)
+- [Release Notes](#release-notes)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -253,6 +254,27 @@ If you encounter issues while running the script, consider the following solutio
 ## Author
 - **Dr. Peter O'Hara-Diaz**
 - Contact: [po@floodgatetech.com](mailto:po@floodgatetech.com)
+
+## Release Notes
+**For detailed release notes of the latest version, including new features, improvements, and bug fixes, please see the [Release Notes](RELEASE_NOTES.md).**
+
+### Changelog for v2.0.0rc
+
+#### 🚀 Major Enhancements
+- **Dynamic Batch Size Calculation**: Automatically adjusts batch size for domain checks based on API limits and processing time.
+- **Parallel Processing with Threading**: Improved performance by enabling concurrent checks using threading.
+- **Advanced Error Handling**: Added custom exceptions and try-catch blocks to improve error resilience.
+- **CI/CD Integration**: Implemented automated testing, coverage reporting, and multi-version testing.
+- **Enhanced Notification System**: Added support for branded email templates with support and logo URLs.
+
+#### 🛠️ Improvements
+- Detailed comments and documentation added to environment configuration.
+- Revised README with new sections for setup, configuration, and performance features.
+- Optimized logging with more descriptive messages and log level control.
+
+#### 🐛 Bug Fixes
+- Resolved missing variables in the environment file.
+- Fixed silent failures by improving error propagation and logging.
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
