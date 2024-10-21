@@ -4,7 +4,7 @@ name: Feature request
 about: Suggest an idea for this project
 title: "[FEATURE] <Describe the feature>"
 labels: enhancement
-assignees: ''
+assignees: 'ripcdoc'
 
 ---
 
