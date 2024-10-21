@@ -29,11 +29,13 @@ Provide any relevant log snippets that might help diagnose the issue.
 **Environment Details**
  - OS: 
  - OS Version: 
- - Python Version: 
- - Have you verified all requirements and dependencies are met?
+ - Python Version:
+
+**Have you verified all requirements and dependencies are met?**
   - [ ] Yes
   - [ ] No
- - Have you tried the latest version?
+
+**Have you tried the latest version?**
   - [ ] Yes
   - [ ] No
 
