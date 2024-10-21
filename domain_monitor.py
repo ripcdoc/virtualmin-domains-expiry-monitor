@@ -56,9 +56,15 @@ def monitor_domains():
             domains = get_domains()
             for domain in domains:
                 days_until_expire = check_domain_expiration(domain)
+                if days_until_expire is None:
+                    logger.warning(f"Could not determine domain expiration for {domain}")
+                    continue
                 if days_until_expire <= Config.DOMAIN_EXPIRATION_ALERT_DAYS:
                     notify_domain_expiration('domain registration', domain, days_until_expire)
                 ssl_days_until_expire = check_ssl_expiration(domain)
+                if ssl_days_until_expire is None:
+                    logger.warning(f"Could not determine SSL expiration for {domain}")
+                    continue
                 if ssl_days_until_expire <= Config.SSL_ALERT_DAYS:
                     notify_domain_expiration('SSL', domain, ssl_days_until_expire)
             time.sleep(Config.CHECK_INTERVAL)
