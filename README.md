@@ -92,28 +92,137 @@ This script now uses a **modular design**, with different modules handling confi
 - **Flexible and Extendable**: Written in a modular way, making it easy to customize or add additional features.
 - **Simple to Use**: Easy setup with basic Python knowledge, making it a valuable tool for administrators managing Webmin servers.
 
-
-
-
 ## Quick Start Guide
-1. **Clone the Repository**:
-    ```bash
-    git clone https://github.com/ripcdoc/virtualmin-domains-expiry-monitor.git
-    cd virtualmin-domains-expiry-monitor
-    ```
 
-2. **Install Dependencies**:
-    ```bash
-    python -m pip install -r requirements.txt
-    ```
+### Step 1: Clone the Repository
 
-3. **Set Up Environment Variables**:
-    - Copy `.env.sample` to `.env` and configure Webmin server details, batch size, and other variables.
+1. Clone the repository to your local machine:
+   ```bash
+   git clone https://github.com/ripcdoc/virtualmin-domains-expiry-monitor.git
+   cd virtualmin-domains-expiry-monitor
+   ```
 
-4. **Run the Script**:
-    ```bash
-    python domain_monitor.py
-    ```
+### Step 2: Install Python Dependencies
+
+1. Ensure you have Python 3 installed.
+2. Install the required packages from the `requirements.txt` file:
+   ```bash
+   python -m pip install -r requirements.txt
+   ```
+
+### Step 3: Set Up Environment Variables
+
+1. Copy the sample environment file and rename it:
+   ```bash
+   cp .env.sample .env
+   ```
+2. Open the `.env` file and configure the following variables:
+   - **Webmin server URLs and API keys**: Set `WEBMIN_SERVERS` & `WEBMIN_API_KEYS`.
+   - **Batch processing settings**: Adjust variables like `BATCH_SIZE`, `API_RATE_LIMIT`, and `AVG_PROCESSING_TIME`.
+   - **Email settings**: Configure variables like `EMAIL_SENDER`, `EMAIL_RECIPIENT`, `SMTP_SERVER`, etc.
+   - **Other settings**: Customize SSL alert days, domain expiration days, retry settings, etc., as needed.
+
+> **Note**: Ensure proper API access is configured in your Webmin control panel.
+
+### Step 4: Verify Template Files
+
+1. Check the `templates/` directory for the default email templates:
+   - `email_html.j2`
+   - `email_plain.j2`
+2. If needed, create customized templates and update the `.env` file accordingly.
+
+### Step 5: Run the Script
+
+1. Execute the script to check domain and SSL expiration:
+   ```bash
+   python domain_monitor.py
+   ```
+2. Check the console output and the log file (`webmin_domains.log`) to ensure proper execution.
+
+### Step 6: Enable Continuous Loop Mode (Optional)
+
+1. Open the `domain_monitor.py` script.
+2. Locate the following lines near the end of the script:
+   ```python
+   if __name__ == "__main__":
+       main()  # Default single-run mode
+       # continuous_loop()  # Uncomment this line to enable continuous loop mode
+   ```
+3. Uncomment the `continuous_loop()` line and comment out the `main()` line.
+4. Save the script and run it:
+   ```bash
+   python domain_monitor.py
+   ```
+
+### Step 7: Set Up as a Systemd Service (Optional)
+
+If using continuous loop mode, you can run the script as a **systemd service**:
+
+1. Create a systemd service file:
+   ```bash
+   sudo nano /etc/systemd/system/webmin-monitor.service
+   ```
+2. Add the following configuration:
+   ```ini
+   [Unit]
+   Description=Webmin Domain and SSL Monitoring Script (Continuous)
+   After=network.target
+
+   [Service]
+   Type=simple
+   User=your-username
+   WorkingDirectory=/path/to/your/script/
+   ExecStart=/usr/bin/python3 /path/to/your/script/domain_monitor.py
+   Restart=always
+   RestartSec=10
+   EnvironmentFile=/path/to/your/script/.env
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+   - Replace `your-username` and `/path/to/your/script/` accordingly.
+
+3. Enable and start the service:
+   ```bash
+   sudo systemctl enable webmin-monitor.service
+   sudo systemctl start webmin-monitor.service
+   ```
+
+### Step 8: Set Up as a Cron Job (Optional)
+
+If using single-run mode, set up a cron job to run the script periodically:
+
+1. Open the crontab editor:
+   ```bash
+   crontab -e
+   ```
+2. Add the cron job entry:
+   ```bash
+   0 2 * * * /usr/bin/python3 /path/to/your/script/domain_monitor.py >> /path/to/your/log/webmin_domains.log 2>&1
+   ```
+
+### Step 9: Review Logs and Monitor Alerts
+
+- Check the log file for any errors or warnings:
+  ```bash
+  tail -f webmin_domains.log
+  ```
+- Monitor email alerts for SSL or domain expirations.
+
+> **Troubleshooting**: If you encounter issues, refer to the **Troubleshooting** section below.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Installation
 - Ensure Python 3.8 or higher is installed.
