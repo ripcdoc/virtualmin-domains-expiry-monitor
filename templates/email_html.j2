@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ subject }}</title>
+    <title>{{ subject if subject else "Domain or SSL Expiry Alert" }}</title
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -33,9 +33,31 @@
 </head>
 <body>
     <div class="container">
-        <h1>{{ subject }}</h1>
-        <p>{{ body_content }}</p>
-        <p class="footer">This is an automated message. Please do not reply.</p>
+        <div class="header">
+            <img src="{{ LOGO_URL }}" alt="Logo" style="max-width: 150px;">
+        </div>
+        <div class="content">
+            <h2>{{ subject if subject else "Domain or SSL Expiry Alert" }}</h2>
+            <p>Hello,</p>
+            <p>This is an automated notification regarding the {{ expiration_type if expiration_type else "domain/SSL" }} for the following domain:</p>
+            <ul>
+                <li><strong>Domain:</strong> {{ domain if domain else "N/A" }}</li>
+                <li><strong>Days until expiration:</strong> {{ days_until_expire if days_until_expire else "N/A" }}</li>
+            </ul>
+            <p>
+                {% if expiration_type == 'SSL' %}
+                    Please renew the SSL certificate as soon as possible.
+                {% elif expiration_type == 'domain registration' %}
+                    Please renew the domain registration to avoid service interruptions.
+                {% else %}
+                    Please check the domain's status.
+                {% endif %}
+            </p>
+        </div>
+        <div class="footer">
+            <p>If you have any questions or need assistance, please visit our <a href="{{ SUPPORT_URL }}">Support Page</a>.</p>
+            <p>This is an automated message. Please do not reply.</p>
+        </div>
     </div>
 </body>
 </html>
