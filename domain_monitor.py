@@ -1,48 +1,87 @@
-
 from domain_operations import gather_all_domains
-from notifications import send_email, render_email_template
+from notifications import send_notification, render_email_template
 from logger import setup_logger
-from config import Config
+from config import Config, ADDITIONAL_DOMAINS
 import time
-import signal
-import sys
 
 logger = setup_logger()
 
-def main():
+
+def gather_all_domains():
     """
-    Main function for monitoring domains.
-    Gathers all domains and checks for expiration or other events.
+    Gathers all domains from Webmin and additional domains specified in the environment variables.
+
+    Returns:
+        list: A list of unique domains to monitor.
     """
     try:
-        all_domains = gather_all_domains()
-
-        for domain in all_domains:
-            # Placeholder for checking expiration or any other processing
-            pass
+        domains = get_domains_from_webmin()
+        additional_domains = [domain.strip() for domain in ADDITIONAL_DOMAINS if domain]
+        unique_domains = list(set(domains + additional_domains))
+        return unique_domains
     except Exception as e:
-        logger.error(f"Error in main: {e}")
+        logger.error(f"Error gathering domains: {e}")
+        return []
 
-def continuous_loop():
+
+def notify_domain_expiration(expiration_type, domain, days_until_expire):
     """
-    Continuous loop for running the main function at regular intervals.
+    Sends a notification email about domain or SSL expiration.
+
+    Args:
+        expiration_type (str): Type of expiration (e.g., 'SSL' or 'domain registration').
+        domain (str): Domain name being monitored.
+        days_until_expire (int): Number of days until expiration.
     """
-    def handle_exit(signum, frame):
-        logger.info("Received exit signal. Shutting down...")
-        sys.exit(0)
+    try:
+        context = prepare_email_context(expiration_type, domain, days_until_expire)
+        subject = context['subject']
+        html_content = render_email_template(Config.EMAIL_TEMPLATE_HTML, context)
+        plain_content = render_email_template(Config.EMAIL_TEMPLATE_PLAIN, context)
+        send_notification(subject, html_content, plain_content)
+    except Exception as e:
+        logger.error(f"Error notifying domain expiration: {e}")
 
-    signal.signal(signal.SIGINT, handle_exit)
-    signal.signal(signal.SIGTERM, handle_exit)
 
+def prepare_email_context(expiration_type, domain, days_until_expire):
+    """
+    Prepares the context for an email notification.
+
+    Args:
+        expiration_type (str): Type of expiration (e.g., 'SSL' or 'domain registration').
+        domain (str): Domain name being monitored.
+        days_until_expire (int): Number of days until expiration.
+
+    Returns:
+        dict: Context dictionary for rendering email templates.
+    """
+    return {
+        'subject': f"{expiration_type} expiration warning for {domain}",
+        'domain': domain,
+        'days_until_expire': days_until_expire,
+        'logo_url': Config.LOGO_URL,
+        'support_url': Config.SUPPORT_URL
+    }
+
+
+def monitor_domains():
+    """
+    Monitors domains for SSL and domain registration expiration and sends notifications as needed.
+    """
     while True:
-        main()
-        logger.info(f"Sleeping for {Config.CHECK_INTERVAL} seconds before the next run.")
-        time.sleep(Config.CHECK_INTERVAL)
+        try:
+            domains = gather_all_domains()
+            for domain in domains:
+                days_until_expire = check_domain_expiration(domain)
+                if days_until_expire <= Config.DOMAIN_EXPIRATION_ALERT_DAYS:
+                    notify_domain_expiration('domain registration', domain, days_until_expire)
+                ssl_days_until_expire = check_ssl_expiration(domain)
+                if ssl_days_until_expire <= Config.SSL_ALERT_DAYS:
+                    notify_domain_expiration('SSL', domain, ssl_days_until_expire)
+            time.sleep(Config.CHECK_INTERVAL)
+        except Exception as e:
+            logger.error(f"Error during domain monitoring: {e}")
+
 
 if __name__ == "__main__":
-    # Uncomment the next line to enable continuous loop mode
-    # continuous_loop()
-
-    # Comment the following line if enabling continuous loop mode
-    main()
-    
+    monitor_domains()
