@@ -92,13 +92,13 @@ cd virtualmin-domains-expiry-monitor
 
 1. Execute the script once to check domain and SSL expiration:
    ```bash
-   python monitor_domains.py
+   python domain_monitor.py
    ```
 2. Check the output in the console and the log file (`webmin_domains.log`) to ensure proper execution.
 
 ### Step 6: Enable Continuous Loop Mode (Optional)
 
-1. Open the `monitor_domains.py` script.
+1. Open the `domain_monitor.py` script.
 2. Locate these lines near the end of the script:
    ```python
    if __name__ == "__main__":
@@ -106,10 +106,9 @@ cd virtualmin-domains-expiry-monitor
        # continuous_loop()  # Uncomment this line to enable continuous loop mode
    ```
 3. Uncomment the `continuous_loop()` line and comment out the `main()` line to switch to continuous mode.
-4. Uncomment the Continuous Loop Mode block as noted in the script comments.
-5. Save the script and run it:
+4. Save the script and run it:
    ```bash
-   python monitor_domains.py
+   python domain_monitor.py
    ```
 
 ### Step 7: (Optional) Set Up as a Systemd Service if using Continuous Loop Mode
@@ -128,7 +127,7 @@ cd virtualmin-domains-expiry-monitor
    Type=simple
    User=your-username
    WorkingDirectory=/path/to/your/script/
-   ExecStart=/usr/bin/python3 /path/to/your/script/monitor_domains.py
+   ExecStart=/usr/bin/python3 /path/to/your/script/domain_monitor.py
    Restart=always
    RestartSec=10
    EnvironmentFile=/path/to/your/script/.env
@@ -282,7 +281,7 @@ Ensure the `.env` file contains all the required variables listed in the **Confi
 ### Commands Summary
 - **Run in single-run mode**:
   ```bash
-  python monitor_domains.py
+  python domain_monitor.py
   ```
 - **Install dependencies**:
   ```bash
@@ -311,7 +310,7 @@ To run the script periodically in single-run mode, you can set up a cron job:
 
  line:
      ```bash
-     0 2 * * * /usr/bin/python3 /path/to/your/script/monitor_domains.py >> /path/to/your/log/webmin_domains.log 2>&1
+     0 2 * * * /usr/bin/python3 /path/to/your/script/domain_monitor.py >> /path/to/your/log/webmin_domains.log 2>&1
      ```
    - Replace `/usr/bin/python3` with the path to your Python interpreter.
    - Replace `/path/to/your/script/` with the path to the script directory.
@@ -331,7 +330,7 @@ To enable continuous execution, follow these steps:
          # main()  # Default single-run mode
          continuous_loop()  # Uncomment this line to enable continuous loop mode
      ```
-  3. Uncomment the `continuous_loop()` line and comment out the `main()` line then uncomment the continuous loop block to switch to continuous mode (clear instructions are included in the script as to what should be uncommented and what to comment out).
+  3. Uncomment the `continuous_loop()` line and comment out the `main()` line.
   4. The script will now run continuously, checking for domain and SSL expiration every `CHECK_INTERVAL` seconds.
 
 > Tip: To test the continuous loop, set a short CHECK_INTERVAL in the .env file (e.g., 60 seconds) to observe how the loop operates in real-time.
@@ -355,7 +354,7 @@ To set up the script as a systemd service for continuous execution:
    Type=simple
    User=your-username
    WorkingDirectory=/path/to/your/script/
-   ExecStart=/usr/bin/python3 /path/to/your/script/monitor_domains.py
+   ExecStart=/usr/bin/python3 /path/to/your/script/domain_monitor.py
    Restart=always
    RestartSec=10
    EnvironmentFile=/path/to/your/script/.env
