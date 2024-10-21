@@ -1,54 +1,74 @@
+import os
+from config import Config, ADDITIONAL_DOMAINS
+from logger import setup_logger
 
-import requests
-from config import Config
-import logging
+logger = setup_logger()
 
-logger = logging.getLogger(__name__)
 
-def get_domains(webmin_url, api_key):
+def read_domains_from_file():
     """
-    Retrieves a list of domains from the specified Webmin server.
-    
-    Args:
-        webmin_url (str): URL of the Webmin server.
-        api_key (str): API key for authentication.
+    Reads domains from the specified domain file.
 
     Returns:
-        list: List of domain names or an empty list if an error occurs.
+        list: A list of domains read from the file.
     """
-    headers = {'Authorization': f"Bearer {api_key}", 'Accept': 'application/json'}
+    domains = []
     try:
-        response = requests.get(
-            f"{webmin_url}/virtual-server/remote.cgi?program=list-domains&name-only",
-            headers=headers, timeout=10, verify=True
-        )
-        response.raise_for_status()
-        return response.text.splitlines()
-    except requests.RequestException as e:
-        logger.error(f"Error retrieving domains from {webmin_url}: {e}")
+        with open(Config.DOMAIN_FILE, 'r') as file:
+            domains = [line.strip() for line in file if line.strip()]
+    except FileNotFoundError:
+        logger.error(f"Domain file '{Config.DOMAIN_FILE}' not found.")
+    except Exception as e:
+        logger.error(f"Error reading domains from file: {e}")
+    return domains
+
+
+def get_domains():
+    """
+    Retrieves all domains from the domain file and adds additional domains from environment variables.
+
+    Returns:
+        list: A list of unique domains.
+    """
+    try:
+        domains = read_domains_from_file()
+        additional_domains = [domain.strip() for domain in ADDITIONAL_DOMAINS if domain]
+        all_domains = list(set(domains + additional_domains))
+        return all_domains
+    except Exception as e:
+        logger.error(f"Error gathering domains: {e}")
         return []
 
-def gather_all_domains():
+
+def check_domain_expiration(domain):
     """
-    Aggregates domains from all Webmin servers and additional sources.
+    Placeholder function to check domain expiration.
+
+    Args:
+        domain (str): The domain name to check.
 
     Returns:
-        list: Unique list of all domains.
+        int: Days until the domain expires.
     """
-    all_domains = []
+    # Placeholder logic for domain expiration check
+    return 30
 
-    # Fetch domains from Webmin servers
-    for i, webmin_url in enumerate(Config.WEBMIN_SERVERS):
-        try:
-            domains = get_domains(webmin_url, Config.WEBMIN_API_KEYS[i])
-            all_domains.extend(domains)
-        except IndexError:
-            logger.error(f"API key missing for server {webmin_url}")
 
-    # Include additional domains from environment variables
-    if Config.ADDITIONAL_DOMAINS:
-        all_domains.extend([domain.strip() for domain in Config.ADDITIONAL_DOMAINS if domain.strip()])
+def check_ssl_expiration(domain):
+    """
+    Placeholder function to check SSL certificate expiration.
 
-    # Ensure the domain list is unique
-    return list(set(all_domains))
+    Args:
+        domain (str): The domain name to check.
 
+    Returns:
+        int: Days until the SSL certificate expires.
+    """
+    # Placeholder logic for SSL expiration check
+    return 15
+
+
+if __name__ == "__main__":
+    domains = get_domains()
+    for domain in domains:
+        logger.info(f"Domain: {domain}")
