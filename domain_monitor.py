@@ -1,27 +1,10 @@
-from domain_operations import gather_all_domains
+from domain_operations import get_domains, check_domain_expiration, check_ssl_expiration
 from notifications import send_notification, render_email_template
 from logger import setup_logger
-from config import Config, ADDITIONAL_DOMAINS
+from config import Config
 import time
 
 logger = setup_logger()
-
-
-def gather_all_domains():
-    """
-    Gathers all domains from Webmin and additional domains specified in the environment variables.
-
-    Returns:
-        list: A list of unique domains to monitor.
-    """
-    try:
-        domains = get_domains_from_webmin()
-        additional_domains = [domain.strip() for domain in ADDITIONAL_DOMAINS if domain]
-        unique_domains = list(set(domains + additional_domains))
-        return unique_domains
-    except Exception as e:
-        logger.error(f"Error gathering domains: {e}")
-        return []
 
 
 def notify_domain_expiration(expiration_type, domain, days_until_expire):
@@ -70,7 +53,7 @@ def monitor_domains():
     """
     while True:
         try:
-            domains = gather_all_domains()
+            domains = get_domains()
             for domain in domains:
                 days_until_expire = check_domain_expiration(domain)
                 if days_until_expire <= Config.DOMAIN_EXPIRATION_ALERT_DAYS:
