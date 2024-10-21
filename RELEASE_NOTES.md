@@ -19,7 +19,7 @@
 - Fixed silent failures by improving error propagation and logging.
 
 ### Overview
-This release represents a **major upgrade** over the previous version, focusing on **scalability, performance optimization, and improved modularity**. It introduces advanced error handling, concurrency enhancements, CI/CD automation, and more robust documentation, making the tool significantly more reliable, easier to configure, and better suited for large-scale domain monitoring.
+This release represents a **major upgrade** over the previous version, focusing on **scalability, performance optimization, and improved modularity**. It introduces advanced error handling, concurrency enhancements, CI/CD automation, multi-version testing up to **Python 3.11**, and more robust documentation, making the tool significantly more reliable, easier to configure, and better suited for large-scale domain monitoring.
 
 ### New Features and Enhancements
 
@@ -70,10 +70,12 @@ This release represents a **major upgrade** over the previous version, focusing 
 #### 6. **Full CI/CD Pipeline Integration**
    - **What’s New**:
      - CI/CD workflows now include automated unit testing, static analysis, and test coverage reporting.
-     - Integrated tools: 
+     - Integrated tools:
        - **`flake8`** for style checks, **`pylint`** for linting, and **`tox`** for multi-version testing.
        - **`pytest`** for unit testing and **`coverage`** for measuring test coverage.
        - **`codecov`** integration for reporting coverage results.
+   - **Multi-Version Testing**:
+     - Now supports Python 3.8, 3.9, 3.10, and **3.11**, ensuring compatibility across multiple versions.
    - **Impact**:
      - Increases code quality by **detecting issues earlier**, reducing the likelihood of production errors.
      - Supports multiple Python versions, ensuring **broader compatibility**.
