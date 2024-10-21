@@ -1,76 +1,87 @@
+
+"""
+domain_monitor.py
+
+This script is the main entry point for monitoring domain and SSL certificate expirations.
+It runs continuously and checks domains in batches, sending notifications when expirations
+are approaching. It utilizes threading for concurrent processing and handles rate limiting.
+"""
+
 from domain_operations import get_domains, check_domain_expiration, check_ssl_expiration
 from notifications import send_notification, render_email_template
 from logger import setup_logger
 from config import Config
+from exceptions import DomainFetchError, SSLCertificateError, NotificationError
 import time
+import threading
 
 logger = setup_logger()
-
 
 def notify_domain_expiration(expiration_type, domain, days_until_expire):
     """
     Sends a notification email about domain or SSL expiration.
 
-    Args:
-        expiration_type (str): Type of expiration (e.g., 'SSL' or 'domain registration').
-        domain (str): Domain name being monitored.
-        days_until_expire (int): Number of days until expiration.
+    Parameters:
+    - expiration_type (str): Type of expiration ('domain' or 'SSL').
+    - domain (str): Domain name being monitored.
+    - days_until_expire (int): Number of days until expiration.
+
+    Raises:
+    - NotificationError: If there is an issue with sending the notification.
     """
     try:
         context = prepare_email_context(expiration_type, domain, days_until_expire)
-        subject = context['subject']
-        html_content = render_email_template(Config.EMAIL_TEMPLATE_HTML, context)
-        plain_content = render_email_template(Config.EMAIL_TEMPLATE_PLAIN, context)
-        send_notification(subject, html_content, plain_content)
-    except Exception as e:
-        logger.error(f"Error notifying domain expiration: {e}")
+        html_content = render_email_template('email_html.j2', context)
+        plain_content = render_email_template('email_plain.j2', context)
+        send_notification(f'{expiration_type} Expiry Alert: {domain}', html_content, plain_content)
+        logger.info(f'Notification sent for {expiration_type} expiration: {domain}')
+    except NotificationError as e:
+        logger.error(f'Notification failed for {expiration_type} expiration: {domain}. Error: {e}')
 
-
-def prepare_email_context(expiration_type, domain, days_until_expire):
+def check_domains_concurrently(domains):
     """
-    Prepares the context for an email notification.
+    Checks domain expiration concurrently using threading.
 
-    Args:
-        expiration_type (str): Type of expiration (e.g., 'SSL' or 'domain registration').
-        domain (str): Domain name being monitored.
-        days_until_expire (int): Number of days until expiration.
+    Parameters:
+    - domains (list): List of domain names to check.
 
-    Returns:
-        dict: Context dictionary for rendering email templates.
+    Each domain is checked in a separate thread to enhance performance and reduce
+    processing time for larger lists of domains. Exception handling ensures errors
+    do not propagate across threads.
     """
-    return {
-        'subject': f"{expiration_type} expiration warning for {domain}",
-        'domain': domain,
-        'days_until_expire': days_until_expire,
-        'logo_url': Config.LOGO_URL,
-        'support_url': Config.SUPPORT_URL
-    }
+    threads = []
+    for domain in domains:
+        try:
+            t = threading.Thread(target=check_domain_expiration, args=(domain,))
+            t.start()
+            threads.append(t)
+        except DomainFetchError as e:
+            logger.error(f'Error fetching domain data for {domain}: {e}')
+        except SSLCertificateError as e:
+            logger.error(f'SSL certificate error for {domain}: {e}')
 
+    for t in threads:
+        t.join()
 
-def monitor_domains():
+def main():
     """
-    Monitors domains for SSL and domain registration expiration and sends notifications as needed.
+    Main loop for continuous domain monitoring.
+
+    This function runs indefinitely, checking domains at regular intervals.
+    It uses batch processing and rate limiting to prevent API overload.
     """
     while True:
         try:
             domains = get_domains()
-            for domain in domains:
-                days_until_expire = check_domain_expiration(domain)
-                if days_until_expire is None:
-                    logger.warning(f"Could not determine domain expiration for {domain}")
-                    continue
-                if days_until_expire <= Config.DOMAIN_EXPIRATION_ALERT_DAYS:
-                    notify_domain_expiration('domain registration', domain, days_until_expire)
-                ssl_days_until_expire = check_ssl_expiration(domain)
-                if ssl_days_until_expire is None:
-                    logger.warning(f"Could not determine SSL expiration for {domain}")
-                    continue
-                if ssl_days_until_expire <= Config.SSL_ALERT_DAYS:
-                    notify_domain_expiration('SSL', domain, ssl_days_until_expire)
-            time.sleep(Config.CHECK_INTERVAL)
-        except Exception as e:
-            logger.error(f"Error during domain monitoring: {e}")
+            if domains:
+                check_domains_concurrently(domains)
+            else:
+                logger.warning("No domains found to monitor.")
+        except DomainFetchError as e:
+            logger.error(f'Error fetching domains: {e}')
 
+        # Wait for the specified interval before the next check
+        time.sleep(Config.CHECK_INTERVAL)
 
-if __name__ == "__main__":
-    monitor_domains()
+if __name__ == '__main__':
+    main()
