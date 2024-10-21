@@ -112,7 +112,7 @@ This script now uses a **modular design**, with different modules handling confi
 
 ### Step 2: Install Python Dependencies
 
-1. Ensure you have Python 3 installed.
+1. Ensure you have Python 3.8 or higher installed.
 2. Install the required packages from the `requirements.txt` file:
    ```bash
    python -m pip install -r requirements.txt
@@ -126,7 +126,7 @@ This script now uses a **modular design**, with different modules handling confi
    ```
 2. Open the `.env` file and configure the following variables:
    - **Webmin server URLs and API keys**: Set `WEBMIN_SERVERS` & `WEBMIN_API_KEYS`.
-   - **Batch processing settings**: Adjust variables like `BATCH_SIZE`, `API_RATE_LIMIT`, and `AVG_PROCESSING_TIME`.
+   - **Batch processing settings**: Adjust variables like `BATCH_SIZE`, `API_RATE_LIMIT`, `AVG_PROCESSING_TIME`, etc.
    - **Email settings**: Configure variables like `EMAIL_SENDER`, `EMAIL_RECIPIENT`, `SMTP_SERVER`, etc.
    - **Other settings**: Customize SSL alert days, domain expiration days, retry settings, etc., as needed.
 
@@ -162,7 +162,18 @@ This script now uses a **modular design**, with different modules handling confi
    python domain_monitor.py
    ```
 
-### Step 7: Set Up as a Systemd Service (Optional)
+### Step 7: Basic Usage
+
+- **Run the Script Once**: Use the following command to run the script in single-run mode:
+  ```bash
+  python domain_monitor.py
+  ```
+- **Continuous Monitoring**: 
+  - Enable continuous monitoring by following the steps in "Enable Continuous Loop Mode" above.
+- **Log Outputs**: 
+  - Check `webmin_domains.log` for detailed logs of domain checks, SSL expiration, and any errors encountered.
+
+### Step 8: Set Up as a Systemd Service (Optional)
 
 If using continuous loop mode, you can run the script as a **systemd service**:
 
@@ -196,7 +207,7 @@ If using continuous loop mode, you can run the script as a **systemd service**:
    sudo systemctl start webmin-monitor.service
    ```
 
-### Step 8: Set Up as a Cron Job (Optional)
+### Step 9: Set Up as a Cron Job (Optional)
 
 If using single-run mode, set up a cron job to run the script periodically:
 
@@ -209,7 +220,7 @@ If using single-run mode, set up a cron job to run the script periodically:
    0 2 * * * /usr/bin/python3 /path/to/your/script/domain_monitor.py >> /path/to/your/log/webmin_domains.log 2>&1
    ```
 
-### Step 9: Review Logs and Monitor Alerts
+### Step 10: Review Logs and Monitor Alerts
 
 - Check the log file for any errors or warnings:
   ```bash
@@ -219,41 +230,114 @@ If using single-run mode, set up a cron job to run the script periodically:
 
 > **Troubleshooting**: If you encounter issues, refer to the **Troubleshooting** section below.
 
+## Detailed Configuration Guide
 
+### Setting Up Webmin API
 
+Before running the script, ensure that the Webmin API is properly configured:
 
+1. **Enable Webmin Remote API**:
+   - Log into Webmin as an administrator.
+   - Navigate to **Webmin Configuration** > **Webmin Modules** > **Remote API**.
+   - Check “Enable Remote API” to allow API access.
 
+2. **Create an API User or Token**:
+   - Go to **Webmin Users** > **Create a new Webmin User**.
+   - Assign a username and a strong password or API token.
+   - Ensure the user has access to the **Virtualmin Module** or **Domain Management**.
 
+3. **Set Permissions**:
+   - Allow read access to domain and SSL certificate information.
+   - Configure “API-only access” for improved security.
 
+4. **Firewall Settings**:
+   - Allow incoming traffic on port 10000 (or the configured Webmin port).
+   - Add IP allowlists or rules to allow access only from trusted IPs.
 
+5. **Verify API Endpoint and Keys**:
+   - The endpoint format should be: `https://<webmin-server>/virtual-server/remote.cgi`.
+   - Set `WEBMIN_SERVERS` and `WEBMIN_API_KEYS` variables in the `.env` file.
 
+### Setting Up the Environment File
 
+Ensure that the `.env` file contains all the required variables. Below is the complete list of environment variables:
 
+```env
+# Webmin server URLs (comma-separated)
+WEBMIN_SERVERS=https://webmin1.example.com,https://webmin2.example.com
 
+# Corresponding API keys for Webmin servers
+WEBMIN_API_KEYS=api_key1,api_key2
 
+# Additional domains to monitor (comma-separated)
+ADDITIONAL_DOMAINS=example.com,anotherexample.com
 
-## Installation
-- Ensure Python 3.8 or higher is installed.
-- Install required dependencies using:
-  ```bash
-  python -m pip install -r requirements.txt
-  ```
+# Batch size settings
+BATCH_SIZE=5                    # Override automatic batch size calculation
+API_RATE_LIMIT=100              # Max API requests per interval
+RATE_LIMIT_INTERVAL=60          # Duration of the rate limit interval in seconds
+AVG_PROCESSING_TIME=0.5         # Avg processing time per domain in seconds
+MAX_BATCH_SIZE=20               # Upper limit for batch size
 
-## Configuration
-- The `.env` file should include:
-  - `WEBMIN_SERVERS`, `WEBMIN_API_KEYS`, `BATCH_SIZE`, `BATCH_DELAY`, etc.
-- Example `.env` configuration:
-  ```
-  WEBMIN_SERVERS=https://webmin1.example.com,https://webmin2.example.com
-  WEBMIN_API_KEYS=api_key1,api_key2
-  BATCH_SIZE=5
-  BATCH_DELAY=2
-  ```
+# Email configuration for sending alerts
+EMAIL_SENDER=noreply@example.com
+EMAIL_RECIPIENT=admin@example.com
+SMTP_SERVER=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=user
+SMTP_PASS=pass
 
-## Usage
-- **Basic Usage**: Run the script using `python domain_monitor.py`.
-- **Continuous Monitoring**: The script checks domains continuously at the interval defined in `.env`.
-- **Log Outputs**: Check `webmin_domains.log` for detailed logs.
+# Log file settings
+LOG_FILE_PATH=webmin_domains.log
+LOG_LEVEL=INFO                  # Log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
+
+# SSL and domain expiration alert thresholds
+SSL_WARNING_DAYS=30             # SSL alert threshold in days
+DOMAIN_EXPIRATION_ALERT_DAYS=45 # Domain expiration alert threshold in days
+
+# Retry configuration for network requests
+MAX_RETRIES=5                   # Maximum retries for failed API calls
+RETRY_DELAY=5                   # Initial delay for retries in seconds
+
+# Persistent error alert settings
+ERROR_ALERT_THRESHOLD=3         # Consecutive errors before sending an alert
+
+# Template directory
+TEMPLATE_DIR=./templates
+
+# Customizable email templates
+EMAIL_HTML_TEMPLATE=email_html.j2
+EMAIL_PLAIN_TEMPLATE=email_plain.j2
+
+# Interval for checks in continuous mode
+CHECK_INTERVAL=3600             # Time interval for continuous mode in seconds
+
+# Support and logo URLs for notifications
+SUPPORT_URL=https://support.example.com
+LOGO_URL=https://example.com/logo.png
+```
+
+### Additional Information on Configuration Variables
+
+- **Webmin Server Configuration**:
+  - Ensure that `WEBMIN_SERVERS` and `WEBMIN_API_KEYS` lists are aligned in the same order.
+- **Batch Size Settings**:
+  - The batch size is dynamically adjusted based on `API_RATE_LIMIT`, `AVG_PROCESSING_TIME`, and `RATE_LIMIT_INTERVAL`.
+  - `MAX_BATCH_SIZE` sets an upper limit to prevent overloading.
+- **Email Configuration**:
+  - Set up the SMTP variables (`EMAIL_SENDER`, `EMAIL_RECIPIENT`, etc.) to enable alert sending.
+- **Alert Thresholds**:
+  - Adjust `SSL_WARNING_DAYS` and `DOMAIN_EXPIRATION_ALERT_DAYS` to define alert times.
+- **Retry Configuration**:
+  - `MAX_RETRIES` controls retry attempts, and `RETRY_DELAY` defines the wait time between retries.
+- **Persistent Error Alerts**:
+  - Set `ERROR_ALERT_THRESHOLD` to trigger alerts for repeated errors.
+- **Customizable Email Templates**:
+  - Use Jinja2 templates specified by `EMAIL_HTML_TEMPLATE` and `EMAIL_PLAIN_TEMPLATE` to customize alerts.
+- **Support and Logo URLs**:
+  - Add URLs for support and logo to enhance the branding of email notifications.
+
+> **Important**: Ensure the `.env` file is secured and not exposed publicly, as it contains sensitive information like API keys and credentials.
 
 ## Example Outputs
 
@@ -262,9 +346,15 @@ If using single-run mode, set up a cron job to run the script periodically:
 2024-10-25 12:00:00,000 - INFO - Checking domain expiration: example.com
 2024-10-25 12:00:05,000 - INFO - Domain example.com will expire in 30 days.
 2024-10-25 12:00:10,000 - INFO - Notification sent for domain expiration: example.com
+2024-10-25 12:01:00,000 - ERROR - Error fetching domain data for example.net: Connection timed out
+2024-10-25 12:01:05,000 - INFO - Retrying domain check for example.net
 ```
 
-### 2. Sample Email Alert (Plain Text)
+![Sample Log Output](images/sample_log_output.png)
+
+> **Note**: Log entries may vary depending on configuration settings, network conditions, and API responses.
+
+### 2. Sample Email Alert (Plain Text & HTML)
 ```
 Subject: Domain Expiry Alert: example.com
 
@@ -281,13 +371,20 @@ Please renew the domain registration to avoid service interruptions.
 This is an automated message. Please do not reply.
 ```
 
+![Sample Plaintext Email Alert](images/sample_email_alert.png)
+![Sample HTML Email Alert](images/html_email_mockup.png)
+
 ### 3. Sample Command-Line Output
 ```
 $ python domain_monitor.py
 Checking domain expiration: example.com
 Domain example.com will expire in 30 days.
 Notification sent for domain expiration: example.com
+Error fetching domain data for example.net: Connection timed out
+Retrying domain check for example.net
 ```
+
+![Sample Command-Line Output](images/sample_command_output.png)
 
 ## Testing
 - **Unit Tests**: Run unit tests using pytest:
