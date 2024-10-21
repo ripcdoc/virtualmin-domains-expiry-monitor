@@ -2,38 +2,62 @@
 
 ![Webmin Monitor Logo](expiry-monitor-logo.webp)
 
+![Last Commit](https://img.shields.io/github/last-commit/ripcdoc/virtualmin-domains-expiry-monitor)
+![Latest Release](https://img.shields.io/github/v/release/ripcdoc/virtualmin-domains-expiry-monitor?include_prereleases&sort=semver&display_name=tag)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![License](https://img.shields.io/github/license/ripcdoc/virtualmin-domains-expiry-monitor)
 ![GitHub Issues](https://img.shields.io/github/issues/ripcdoc/virtualmin-domains-expiry-monitor)
-![GitHub Forks](https://img.shields.io/github/forks/ripcdoc/virtualmin-domains-expiry-monitor)
-![GitHub Stars](https://img.shields.io/github/stars/ripcdoc/virtualmin-domains-expiry-monitor)
-![Last Commit](https://img.shields.io/github/last-commit/ripcdoc/virtualmin-domains-expiry-monitor)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/virtualmin-domains-expiry-monitor)
+# ![GitHub Forks](https://img.shields.io/github/forks/ripcdoc/virtualmin-domains-expiry-monitor)
+# ![GitHub Stars](https://img.shields.io/github/stars/ripcdoc/virtualmin-domains-expiry-monitor)
+
+
 
 ## Table of Contents
 - [Introduction](#introduction)
 - [Version Information](#version-information)
+  - [Current Version: v2.0.0rc](#current-version-v200rc-released-on-2024-10-21)
+  - [Notable Changes](#notable-changes)
 - [Features](#features)
 - [Why Use This Script?](#why-use-this-script)
 - [Quick Start Guide](#quick-start-guide)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage](#usage)
+  - [Step 1: Clone the Repository](#step-1-clone-the-repository)
+  - [Step 2: Install Python Dependencies](#step-2-install-python-dependencies)
+  - [Step 3: Set Up Environment Variables](#step-3-set-up-environment-variables)
+  - [Step 4: Verify Template Files](#step-4-verify-template-files)
+  - [Step 5: Run the Script](#step-5-run-the-script)
+  - [Step 6: Enable Continuous Loop Mode (Optional)](#step-6-enable-continuous-loop-mode-optional)
+  - [Step 7: Basic Usage](#step-7-basic-usage)
+  - [Step 8: Set Up as a Systemd Service (Optional)](#step-8-set-up-as-a-systemd-service-optional)
+  - [Step 9: Set Up as a Cron Job (Optional)](#step-9-set-up-as-a-cron-job-optional)
+  - [Step 10: Review Logs and Monitor Alerts](#step-10-review-logs-and-monitor-alerts)
+- [Detailed Configuration Guide](#detailed-configuration-guide)
+  - [Setting Up Webmin API](#setting-up-webmin-api)
+  - [Setting Up the Environment File](#setting-up-the-environment-file)
+  - [Email Template Customization](#email-template-customization)
+  - [Additional Information on Configuration Variables](#additional-information-on-configuration-variables)
 - [Example Outputs](#example-outputs)
+  - [1. Sample Log Output](#1-sample-log-output)
+  - [2. Sample Email Alert (Plain Text & HTML)](#2-sample-email-alert-plain-text--html)
+  - [3. Sample Command-Line Output](#3-sample-command-line-output)
 - [Testing](#testing)
+  - [1. Unit Tests](#1-unit-tests)
+  - [2. Coverage Testing](#2-coverage-testing)
+  - [3. Static Analysis](#3-static-analysis)
+  - [4. Multi-Version Testing](#4-multi-version-testing)
+  - [5. CI/CD Pipeline Testing](#5-cicd-pipeline-testing)
 - [CI/CD Integration](#cicd-integration)
-- [Logo Placeholder](#logo-placeholder)
-- [Unit and Service Sections](#unit-and-service-sections)
+  - [Key Features of the CI/CD Pipeline](#key-features-of-the-cicd-pipeline)
+  - [How It Works](#how-it-works)
+- [Contributing](#contributing)
+  - [How to Contribute](#how-to-contribute)
+  - [Contribution Guidelines](#contribution-guidelines)
 - [Common Issues](#common-issues)
-- [Error Handling Settings](#error-handling-settings)
-- [Proactive Monitoring Feature](#proactive-monitoring-feature)
-- [Continuous Loop Enablement](#continuous-loop-enablement)
-- [Additional Requirements](#additional-requirements)
-- [Webmin Configuration Details](#webmin-configuration-details)
 - [Author](#author)
 - [Release Notes](#release-notes)
-- [Contributing](#contributing)
-- [License](#license)
+  - [Changelog for v2.0.0rc](#changelog-for-v200rc)
+    - [🚀 Major Enhancements](#-major-enhancements)
+    - [🛠️ Improvements](#️-improvements)
+    - [🐛 Bug Fixes](#-bug-fixes)
 
 ## Introduction
 This Python script helps administrators monitor the expiration of SSL certificates and domain registrations for domains managed by Webmin/Virtualmin servers. It interacts with the Webmin API, fetches the list of domains, checks their SSL and domain registration expiration dates, and logs warnings if they are close to expiry. It also updates a local file (`domains.txt`) to track current domains and logs any changes. The script uses Jinja2 for templating and full customization of the email alerts.
@@ -94,7 +118,7 @@ This script now uses a **modular design**, with different modules handling confi
 - **Cron Job Setup**: Can be run periodically in single-run mode using a cron job, allowing for scheduled execution at specific times.
 
 ## Why Use This Script?
-- **Proactive Monitoring**: Get alerted well in advance of SSL or domain expiration to prevent downtime, security risks, or unexpected loss of domain ownership.
+- **Proactive Monitoring**: Sends alerts well in advance of domain or SSL expiration to prevent downtime, security risks, or unexpected loss of domain ownership. Alerts are configurable based on user-defined thresholds, ensuring ample time for remediation.
 - **Automated Updates**: Automatically syncs the domain list from Webmin, removing the need for manual domain management.
   - **Note:** The `domains.txt` file, which stores the list of domains, will be created automatically during the first run if it doesn't already exist. This ensures seamless initialization and operation without any additional setup.
 - **Flexible and Extendable**: Written in a modular way, making it easy to customize or add additional features.
@@ -260,7 +284,9 @@ Before running the script, ensure that the Webmin API is properly configured:
 
 ### Setting Up the Environment File
 
-Ensure that the `.env` file contains all the required variables. Below is the complete list of environment variables:
+> **Important:** Ensure the `.env` file is secured and not exposed publicly, as it contains sensitive information like API keys and credentials.
+> 
+> **Important:** Ensure that the `.env` file contains all the required variables. Below is the complete list of environment variables:
 
 ```env
 # Webmin server URLs (comma-separated)
@@ -299,8 +325,9 @@ DOMAIN_EXPIRATION_ALERT_DAYS=45 # Domain expiration alert threshold in days
 MAX_RETRIES=5                   # Maximum retries for failed API calls
 RETRY_DELAY=5                   # Initial delay for retries in seconds
 
-# Persistent error alert settings
-ERROR_ALERT_THRESHOLD=3         # Consecutive errors before sending an alert
+### Persistent Error Handling Settings
+- **ERROR_ALERT_THRESHOLD**: Sets the number of consecutive errors required to trigger a persistent error alert. If the same error occurs for this many times, an alert is sent.
+- **MAX_RETRIES**: Determines how many times the script will retry an API call in case of a failure.
 
 # Template directory
 TEMPLATE_DIR=./templates
@@ -317,13 +344,52 @@ SUPPORT_URL=https://support.example.com
 LOGO_URL=https://example.com/logo.png
 ```
 
+### Email Template Customization
+
+The email templates used for sending alerts are located in the `templates` directory and are rendered using Jinja2. You can modify these templates to match your organization’s branding and preferred format.
+
+#### 1. Modifying the HTML Email Template (`email_html.j2`)
+
+- The HTML template includes a placeholder image at the top, which can be replaced with your organization’s logo.
+  - To update the logo, edit the `src` attribute of the `<img>` tag in the `email_html.j2` file:
+    ```html
+    <img src="{{ LOGO_URL }}" alt="Organization Logo" style="max-width: 100px;">
+    ```
+  - Update the `LOGO_URL` environment variable in the `.env` file to point to your desired logo URL:
+    ```env
+    LOGO_URL=https://yourdomain.com/path/to/logo.png
+    ```
+
+#### 2. Customizing Plain Text Email Template (`email_plain.j2`)
+
+- The plain text template can be modified to adjust the text content of email alerts. Open `email_plain.j2` and edit the message body as needed.
+
+#### 3. Additional Template Variables
+
+- Both templates use variables defined in the script, such as `domain`, `days_until_expire`, and `SUPPORT_URL`.
+  - You can add new variables to the templates and update the Python code accordingly to pass additional context.
+  - To update the support link, modify the `SUPPORT_URL` environment variable:
+    ```env
+    SUPPORT_URL=https://support.yourdomain.com
+    ```
+
+#### 4. Previewing Changes
+
+- After modifying the templates, run the script locally to send test emails and ensure that the templates render correctly.
+- Check both HTML and plain text formats in your email client to confirm that the changes are displayed as expected.
+- After modifying templates, consider running unit tests or sending test alerts to verify changes before deploying them in production.
+
+> **Note:** Make sure the Jinja2 syntax in the templates is correct to avoid rendering errors in the email notifications.
+
 ### Additional Information on Configuration Variables
 
 - **Webmin Server Configuration**:
   - Ensure that `WEBMIN_SERVERS` and `WEBMIN_API_KEYS` lists are aligned in the same order.
 - **Batch Size Settings**:
   - The batch size is dynamically adjusted based on `API_RATE_LIMIT`, `AVG_PROCESSING_TIME`, and `RATE_LIMIT_INTERVAL`.
+    - Example: If `API_RATE_LIMIT` is set to 100 and `AVG_PROCESSING_TIME` is set to 0.5 seconds, the calculated batch size will be adjusted accordingly to maximize processing efficiency within the rate limits.
   - `MAX_BATCH_SIZE` sets an upper limit to prevent overloading.
+
 - **Email Configuration**:
   - Set up the SMTP variables (`EMAIL_SENDER`, `EMAIL_RECIPIENT`, etc.) to enable alert sending.
 - **Alert Thresholds**:
@@ -338,6 +404,8 @@ LOGO_URL=https://example.com/logo.png
   - Add URLs for support and logo to enhance the branding of email notifications.
 
 > **Important**: Ensure the `.env` file is secured and not exposed publicly, as it contains sensitive information like API keys and credentials.
+
+> **Note:** For instructions on setting up the script as a systemd service, please refer to [Step 8 in the Quick Start Guide](#quick-start-guide).
 
 ## Example Outputs
 
@@ -387,83 +455,107 @@ Retrying domain check for example.net
 ![Sample Command-Line Output](images/sample_command_output.png)
 
 ## Testing
-- **Unit Tests**: Run unit tests using pytest:
-  ```bash
-  pytest tests/
-  ```
-- **Static Analysis**: Run flake8 and pylint for code quality checks:
-  ```bash
-  flake8 .
-  pylint **/*.py
-  ```
-- **Multi-Version Testing**: Run tox for testing compatibility across Python versions:
-  ```bash
-  tox
-  ```
+
+### 1. Unit Tests
+Run unit tests using `pytest` to verify the functionality of the modules:
+```bash
+pytest tests/
+```
+
+### 2. Coverage Testing
+To measure test coverage, use the `coverage` module integrated with `pytest`:
+```bash
+coverage run -m pytest
+coverage report -m  # Display the coverage report in the terminal
+coverage html       # Generate an HTML coverage report
+```
+> The CI pipeline automatically uploads coverage reports to **Codecov**. You can view detailed coverage reports on the Codecov dashboard.
+
+### 3. Static Analysis
+Run `flake8` and `pylint` for code quality checks:
+```bash
+flake8 .
+pylint **/*.py
+```
+
+### 4. Multi-Version Testing
+Use `tox` to run tests across multiple Python versions (3.8, 3.9, 3.10, 3.11):
+```bash
+tox
+```
+> This command mirrors the multi-version testing performed in the CI pipeline, ensuring compatibility across supported Python versions.
+
+### 5. CI/CD Pipeline Testing
+The CI/CD pipeline performs:
+- **Automated unit testing** for each push and pull request.
+- **Multi-version testing** using `tox`.
+- **Coverage testing** with results uploaded to **Codecov** for analysis.
+
 
 ## CI/CD Integration
-- The CI/CD pipeline is configured using GitHub Actions.
-- It includes:
-  - Static Analysis: Runs flake8 and pylint.
-  - Multi-Version Testing: Tests Python 3.8, 3.9, and 3.10 using tox.
-  - Unit Testing: Uses pytest to validate functionality across modules.
+
+The CI/CD pipeline is configured using **GitHub Actions** and is designed to automate testing, coverage reporting, and code quality checks.
+
+### Key Features of the CI/CD Pipeline
+
+- **Static Analysis**: 
+  - Runs `flake8` and `pylint` to ensure code quality and adherence to Python best practices.
+
+- **Multi-Version Testing**: 
+  - Tests the code across Python 3.8, 3.9, 3.10, and 3.11 using `tox`.
+  - This ensures compatibility and consistent behavior across supported Python versions.
+
+- **Unit Testing**: 
+  - Uses `pytest` to validate functionality across modules.
+  - Unit tests are executed for each supported Python version.
+
+- **Coverage Testing**: 
+  - Uses the `coverage` module to measure test coverage during the CI pipeline run.
+  - Coverage reports are uploaded to **Codecov** for analysis, providing insights into code coverage metrics.
+
+### How It Works
+- The CI/CD pipeline is triggered on:
+  - **Pushes** to the `main` or `development` branches.
+  - **Pull requests** targeting the `main` or `development` branches.
+
+- The pipeline performs the following steps:
+  1. **Check out code** from the repository.
+  2. **Set up Python** for the specified versions.
+  3. **Install dependencies** from `requirements.txt`.
+  4. **Run static analysis**, unit tests, and coverage checks.
+  5. **Upload coverage results** to Codecov.
+
+> The CI/CD pipeline ensures that all new changes are automatically tested and verified, reducing the likelihood of issues in production.
 
 ## Contributing
-- Contributions are welcome! Please follow the contribution guidelines in the CONTRIBUTING.md file.
-- Open issues for bug reports or feature requests and submit pull requests for new features or fixes.
 
-## Logo Placeholder
-- The email templates include a placeholder image at the top of the HTML email, which can be replaced with your organization's logo. To update, modify the `src` attribute of the `<img>` tag in `email_html.j2`.
+We welcome contributions from the community! Please follow the guidelines outlined in the [CONTRIBUTING.md](CONTRIBUTING.md) file to ensure a smooth process.
 
-## Unit and Service Sections
-- To run the script as a systemd service, follow these steps:
-  1. Create a systemd service file (e.g., `/etc/systemd/system/domain-monitor.service`):
-     ```
-     [Unit]
-     Description=Domain and SSL Expiry Monitor
-     After=network.target
+### How to Contribute
 
-     [Service]
-     ExecStart=/usr/bin/python3 /path/to/domain_monitor.py
-     Restart=always
+1. **Open an Issue**: 
+   - If you encounter a bug or have a feature request, please open an issue on GitHub.
+   - Clearly describe the problem or feature, providing relevant details and examples.
 
-     [Install]
-     WantedBy=multi-user.target
-     ```
-  2. Enable and start the service:
-     ```bash
-     sudo systemctl enable domain-monitor
-     sudo systemctl start domain-monitor
-     ```
+2. **Submit a Pull Request**:
+   - Fork the repository and create a new branch for your changes.
+   - Make your changes, ensuring code quality by running unit tests, static analysis, and multi-version testing.
+   - Submit a pull request to the `development` branch, following the guidelines in `CONTRIBUTING.md`.
+
+### Contribution Guidelines
+
+- Follow the coding standards described in the `CONTRIBUTING.md` file.
+- Ensure that your changes pass all CI/CD checks before submission.
+- Be respectful and constructive in discussions; please review the [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+
+> For more details, please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## Common Issues
 If you encounter issues while running the script, consider the following solutions:
-- Ensure all environment variables are set correctly in the `.env` file.
-- Verify that the Webmin servers are accessible and that the API keys are valid.
-- Check the logs (`webmin_domains.log`) for detailed error messages.
-
-## Error Handling Settings
-- **ERROR_ALERT_THRESHOLD**: Sets the number of consecutive errors required to trigger a persistent error alert. If the same error occurs for this many times, an alert is sent.
-- **MAX_RETRIES**: Determines how many times the script will retry an API call in case of a failure.
-
-## Proactive Monitoring Feature
-- The script sends alerts well in advance of domain or SSL expiration to prevent downtime, security risks, or unexpected loss of domain ownership.
-
-## Continuous Loop Enablement
-- To enable continuous monitoring, uncomment the `continuous_loop()` line in `domain_monitor.py`.
-  ```python
-  if __name__ == "__main__":
-      # continuous_loop()  # Uncomment this line to enable continuous loop mode
-  ```
-
-## Additional Requirements
-- The script requires specific dependencies, including:
-  - `jinja2` for email template rendering.
-
-## Webmin Configuration Details
-- The `.env` file should specify the following:
-  - **WEBMIN_SERVERS**: A comma-separated list of Webmin server URLs.
-  - **WEBMIN_API_KEYS**: Corresponding API keys for the Webmin servers.
+- Ensure all environment variables are set correctly in the `.env` file and check for missing or incorrectly formatted variables.
+- Verify that the Webmin servers are accessible and that the API keys are valid. Make sure the servers are online and that there are no network restrictions.
+- Check the logs (`webmin_domains.log`) for detailed error messages and identify potential issues.
+- If you encounter authentication errors, review the API permissions in Webmin and ensure the user has adequate access.
 
 ## Author
 - **Dr. Peter O'Hara-Diaz**
