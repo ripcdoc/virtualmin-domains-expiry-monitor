@@ -1,23 +1,22 @@
-Subject: {{ subject }}
+
+Subject: {{ subject if subject else "Domain or SSL Expiry Alert" }}
 
 Hello,
 
-This is an automated notification regarding the {{ expiration_type }} for the following domain:
+This is an automated notification regarding the {{ expiration_type if expiration_type else "domain/SSL" }} for the following domain:
 
-Domain: {{ domain }}
-Days until expiration: {{ days_until_expire }}
+Domain: {{ domain if domain else "N/A" }}
+Days until expiration: {{ days_until_expire if days_until_expire else "N/A" }}
 
 {% if expiration_type == 'SSL' %}
-The SSL certificate for this domain is set to expire soon. Please take the necessary steps to renew the certificate to maintain secure access.
+Please renew the SSL certificate as soon as possible.
 {% elif expiration_type == 'domain registration' %}
-The domain registration is nearing its expiration date. Please ensure that it is renewed promptly to avoid potential downtime or loss of ownership.
+Please renew the domain registration to avoid service interruptions.
+{% else %}
+Please check the domain's status.
 {% endif %}
 
-For more information or assistance, please visit our Support Page:
-{{ support_url }}
-
-Thank you for using Webmin Monitoring Script.
+Thank you.
 
 ---
-© 2024 Webmin Monitor. All rights reserved.
-Visit our website: {{ support_url }}
+This is an automated message. Please do not reply.

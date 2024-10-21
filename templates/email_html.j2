@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,60 +20,22 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .header {
-            text-align: center;
-            padding-bottom: 20px;
-        }
-        .header img {
-            max-width: 200px;
-            height: auto;
-        }
-        .content {
-            margin: 20px 0;
-        }
-        .content h1 {
-            color: #333333;
-        }
-        .content p {
-            color: #555555;
-            line-height: 1.5;
-        }
-        .content a {
-            color: #1e90ff;
-            text-decoration: none;
+        /* Inline styling for compatibility */
+        h1, p {
+            margin: 0 0 10px;
         }
         .footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #999999;
             font-size: 12px;
+            color: #888888;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <img src="{{ logo_url }}" alt="Webmin Monitor Logo">
-        </div>
-        <div class="content">
-            <h1>{{ subject }}</h1>
-            <p>Hello,</p>
-            <p>This is an automated notification regarding the {{ expiration_type }} for the following domain:</p>
-            <p><strong>Domain:</strong> {{ domain }}</p>
-            <p><strong>Days until expiration:</strong> {{ days_until_expire }}</p>
-
-            {% if expiration_type == 'SSL' %}
-                <p>The SSL certificate for this domain is set to expire soon. Please take the necessary steps to renew the certificate to maintain secure access.</p>
-            {% elif expiration_type == 'domain registration' %}
-                <p>The domain registration is nearing its expiration date. Please ensure that it is renewed promptly to avoid potential downtime or loss of ownership.</p>
-            {% endif %}
-            
-            <p>For more information or assistance, please visit our <a href="{{ support_url }}">Support Page</a>.</p>
-        </div>
-        <div class="footer">
-            <p>© 2024 Webmin Monitor. All rights reserved.</p>
-            <p>Visit our website: <a href="{{ support_url }}">{{ support_url }}</a></p>
-        </div>
+        <h1>{{ subject }}</h1>
+        <p>{{ body_content }}</p>
+        <p class="footer">This is an automated message. Please do not reply.</p>
     </div>
 </body>
 </html>
