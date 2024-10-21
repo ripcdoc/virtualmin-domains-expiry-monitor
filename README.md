@@ -551,6 +551,14 @@ The expected dependencies include:
 
 Check the log file (`webmin_domains.log`) for detailed logs of activities and errors.
 
+## Reporting Issues
+
+If you encounter any bugs or have feature suggestions, please open an issue on the [Issues Page](https://github.com/ripcdoc/virtualmin-domains-expiry-monitor/issues).
+
+If you discover a security vulnerability, please send an email to [po@floodgatetech.com](mailto:po@floodgatetech.com) and provide detailed information about the vulnerability, including reproduction steps.
+We will acknowledge receipt within 48 hours and follow up with further communication.
+We encourage responsible disclosure. Please avoid publicly disclosing the vulnerability until we release a patch.
+
 ## Author
 
 - **Dr. Peter O'Hara-Diaz**
