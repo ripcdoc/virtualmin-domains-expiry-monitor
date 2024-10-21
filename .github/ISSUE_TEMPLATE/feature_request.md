@@ -22,3 +22,12 @@ Add any other context or screenshots about the feature request here.
 
 **Priority**
 Indicate the priority level of this feature request: [Low, Medium, High]
+
+## Estimated Effort
+Provide an estimate of the effort required to implement this feature: [Low, Medium, High]
+
+## Dependencies
+List any dependencies or prerequisites that must be met before implementing this feature.
+
+## Impact
+Describe the expected impact of this feature on the existing system or workflow.
