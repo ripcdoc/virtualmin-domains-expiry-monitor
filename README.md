@@ -2,6 +2,50 @@
 
 ![Webmin Monitor Logo](expiry-monitor-logo.webp)
 
+# Table of Contents
+- [Webmin Domain and SSL Expiry Monitoring Script with Jinja2 Templated Alerts & Comprehensive Error Handling](#webmin-domain-and-ssl-expiry-monitoring-script-with-jinja2-templated-alerts-&-comprehensive-error-handling)
+   - [Overview](#overview)
+   - [Features](#features)
+   - [Why Use This Script?](#why-use-this-script?)
+   - [Quick Start Guide](#quick-start-guide)
+      - [Step 1: Clone the Repository](#step-1:-clone-the-repository)
+      - [Step 2: Install Python Dependencies](#step-2:-install-python-dependencies)
+      - [Step 3: Configure the `.env` File](#step-3:-configure-the-`env`-file)
+      - [Step 4: Verify the Template Files](#step-4:-verify-the-template-files)
+      - [Step 5: Run the Script in Single-Run Mode](#step-5:-run-the-script-in-single-run-mode)
+      - [Step 6: Enable Continuous Loop Mode (Optional)](#step-6:-enable-continuous-loop-mode-(optional))
+      - [Step 7: (Optional) Set Up as a Systemd Service if using Continuous Loop Mode](#step-7:-(optional)-set-up-as-a-systemd-service-if-using-continuous-loop-mode)
+      - [Step 8: (Optional) Set Up as a Cron Job if using Single-Run Mode](#step-8:-(optional)-set-up-as-a-cron-job-if-using-single-run-mode)
+      - [Step 9: Review Logs and Monitor Alerts](#step-9:-review-logs-and-monitor-alerts)
+   - [Detailed Configuration Guide](#detailed-configuration-guide)
+      - [Setting Up Webmin API](#setting-up-webmin-api)
+      - [Setting Up the Environment File](#setting-up-the-environment-file)
+   - [Additional Information on Configuration Variables](#additional-information-on-configuration-variables)
+      - [Note About Setting Up Environment Variables](#note-about-setting-up-environment-variables)
+   - [Running the Script](#running-the-script)
+      - [Commands Summary](#commands-summary)
+      - [Single-Run Mode](#single-run-mode)
+         - [To run as a Cron Job daily/weekly/etc. in Single-Run Mode](#to-run-as-a-cron-job-daily/weekly/etc-in-single-run-mode)
+      - [Continuous Loop Mode](#continuous-loop-mode)
+         - [To run as a Systemd Service in Continuous Loop Mode](#to-run-as-a-systemd-service-in-continuous-loop-mode)
+   - [Comprehensive Error Handling](#comprehensive-error-handling)
+   - [Customizing Jinja2 Email Templates](#customizing-jinja2-email-templates)
+      - [Default Templates](#default-templates)
+      - [Structure of the Templates](#structure-of-the-templates)
+         - [HTML Template (`email_html.j2`)](#html-template-(`email_htmlj2`))
+         - [Plaintext Template (`email_plain.j2`)](#plaintext-template-(`email_plainj2`))
+      - [Modifying the Templates](#modifying-the-templates)
+      - [Example Template Modification](#example-template-modification)
+      - [Template Directory](#template-directory)
+   - [Troubleshooting](#troubleshooting)
+      - [Troubleshooting Specific Issues](#troubleshooting-specific-issues)
+   - [Additional Information](#additional-information)
+      - [Dependencies](#dependencies)
+      - [Logs](#logs)
+   - [Reporting Issues](#reporting-issues)
+   - [Author](#author)
+   - [License](#license)
+
 ## Overview
 
 This Python script helps administrators monitor the expiration of SSL certificates and domain registrations for domains managed by Webmin/Virtualmin servers. It interacts with the Webmin API, fetches the list of domains, checks their SSL and domain registration expiration dates, and logs warnings if they are close to expiry. It also updates a local file (`domains.txt`) to track current domains and logs any changes. The script uses Jinja2 for templating and full customization of the email alerts.
@@ -243,6 +287,13 @@ EMAIL_TEMPLATE_PLAIN=email_plain.j2 # Jinja2 template for plain-text email alert
 
 # Interval in seconds between runs in continuous mode
 CHECK_INTERVAL=86400              # Default interval: 24 hours
+
+# Template directory (for Jinja2 templates)
+TEMPLATE_DIR=./templates
+
+# Customizable email templates
+EMAIL_TEMPLATE_HTML=email_html.j2
+EMAIL_TEMPLATE_PLAIN=email_plain.j2
 ```
 > **Note:** The `domains.txt` file does not need to exist before the first run of the script; it will be created automatically based on the retrieved domains.
 
@@ -256,9 +307,7 @@ CHECK_INTERVAL=86400              # Default interval: 24 hours
   - The `EMAIL_RECIPIENTS` field accepts multiple email addresses separated by commas, allowing alerts to be sent to multiple recipients simultaneously.
 - **SSL and Domain Expiration Alert Thresholds**:
   - Adjust `SSL_ALERT_DAYS` and `DOMAIN_EXPIRATION_ALERT_DAYS` to set the desired threshold for when to receive alerts about upcoming expirations.
-  - For example, setting `SSL_ALERT_DAYS=10` will trigger an
-
- alert if an SSL certificate has 10 days or less until it expires.
+  - For example, setting `SSL_ALERT_DAYS=10` will trigger an alert if an SSL certificate has 10 days or less until it expires.
 - **Retry Configuration**:
   - `MAX_RETRIES` determines how many times the script will retry an API call in case of a failure.
   - `RETRY_WAIT` sets the initial wait time for retries; this will increase exponentially (e.g., 5 seconds, 10 seconds, etc.) with each attempt.
@@ -535,11 +584,9 @@ pip install -r requirements.txt
 The expected dependencies include:
 - `requests`
 - `python-dotenv`
-- `tenacity`
 - `jinja2`
-- `smtplib` (built-in)
 
-> **Unsupported Recommendation for Python Experienced Users:**
+> **Recommended for All Users: Using a virtual environment helps manage dependencies and prevent conflicts with other Python projects.**
 > Use a virtual environment to manage dependencies and prevent conflicts with other Python projects. To create and activate a virtual environment, run:
 > ```bash
 > python3 -m venv venv
