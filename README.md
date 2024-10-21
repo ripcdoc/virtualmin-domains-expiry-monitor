@@ -3,15 +3,11 @@
 ![Webmin Monitor Logo](expiry-monitor-logo.webp)
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![Python Versions](https://img.shields.io/pypi/pyversions/virtualmin-domains-expiry-monitor)
-![License](https://img.shields.io/badge/license-MIT-green)
 ![License](https://img.shields.io/github/license/ripcdoc/virtualmin-domains-expiry-monitor)
-![Build Status](https://img.shields.io/github/actions/workflow/status/ripcdoc/virtualmin-domains-expiry-monitor/main.yml)
 ![GitHub Issues](https://img.shields.io/github/issues/ripcdoc/virtualmin-domains-expiry-monitor)
 ![GitHub Forks](https://img.shields.io/github/forks/ripcdoc/virtualmin-domains-expiry-monitor)
 ![GitHub Stars](https://img.shields.io/github/stars/ripcdoc/virtualmin-domains-expiry-monitor)
 ![Last Commit](https://img.shields.io/github/last-commit/ripcdoc/virtualmin-domains-expiry-monitor)
-![Coverage](https://img.shields.io/codecov/c/github/ripcdoc/virtualmin-domains-expiry-monitor)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/virtualmin-domains-expiry-monitor)
 
 # Table of Contents
