@@ -1,30 +1,37 @@
-
 import logging
 
-def setup_logger(log_file='app.log', level=logging.INFO):
-    """
-    Sets up the application logger.
 
-    Args:
-        log_file (str): The log file to write logs to.
-        level (int): Logging level (e.g., logging.INFO, logging.DEBUG).
+def setup_logger():
+    """
+    Sets up and returns a logger instance.
 
     Returns:
         logging.Logger: Configured logger instance.
     """
-    try:
-        logger = logging.getLogger(__name__)
-        logger.setLevel(level)
+    logger = logging.getLogger("webmin_domains")
+    logger.setLevel(logging.DEBUG)
+    
+    # Create file handler which logs messages
+    file_handler = logging.FileHandler("webmin_domains.log")
+    file_handler.setLevel(logging.INFO)
+    
+    # Create console handler with a higher log level
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.ERROR)
+    
+    # Create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    console_handler.setFormatter(formatter)
+    
+    # Add the handlers to the logger
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+    
+    return logger
 
-        handler = logging.FileHandler(log_file)
-        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-        handler.setFormatter(formatter)
 
-        if not logger.hasHandlers():
-            logger.addHandler(handler)
+logger = setup_logger()
 
-        return logger
-    except Exception as e:
-        print(f"Failed to set up logger: {e}")
-        return None
-
+if __name__ == "__main__":
+    logger.info("Logger setup complete.")
