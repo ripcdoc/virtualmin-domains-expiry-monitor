@@ -59,36 +59,37 @@ This script now uses a **modular design**, with different modules handling confi
 ## Features
 - **Concurrent Domain Monitoring**: Uses threading to check multiple domains simultaneously.
 - **Batch Processing**: Processes domains in batches to manage API load and prevent rate limits.
-- **Static Analysis and Unit Testing**: Integrated tools for code quality and robustness.
-- **Multi-Version Testing**: Supports Python 3.8, 3.9, and 3.10 to ensure compatibility.
+- **Static Analysis and Unit Testing**: Integrated tools for code quality and robustness, ensuring reliability.
+- **Multi-Version Testing**: Supports Python 3.8, 3.9, 3.10, and 3.11 (if included in CI/CD) to ensure compatibility.
 - **Modular Architecture**: The script is structured into separate modules:
-  - **`config.py`**: Manages configuration loading from the `.env` file.
-  - **`domain_operations.py`**: Handles domain retrieval from Webmin servers and includes support for additional domains.
-  - **`notifications.py`**: Manages email alerts using Jinja2 templates.
-  - **`logger.py`**: Sets up centralized logging.
-  - **`domain_monitor.py`**: Acts as the main controller to orchestrate the workflow.
+  - `config.py`: Manages configuration loading from the `.env` file.
+  - `domain_operations.py`: Handles domain retrieval from Webmin servers and includes support for additional domains.
+  - `notifications.py`: Manages email alerts using Jinja2 templates.
+  - `logger.py`: Sets up centralized logging.
+  - `domain_monitor.py`: Acts as the main controller to orchestrate the workflow.
 - **Fetch Domain List from Webmin API**: Automatically retrieves the list of domains from one or more Webmin servers using the Webmin API.
 - **SSL Certificate Expiration Check**: Checks SSL certificate expiration dates and logs warnings if certificates are close to expiry.
 - **Domain Registration Expiration Check**: Verifies domain registration expiration dates and logs warnings if registrations are near expiry.
 - **Automatic Domain Management**: Updates the local domain file (`domains.txt`) by adding new domains and removing deleted ones.
 - **Support for Additional Domains**: Users can specify additional domains to be monitored by setting the `ADDITIONAL_DOMAINS` variable in the `.env` file.
-- **Customizable Email Alerts with Jinja2 Templates**: Sends HTML and plain-text email alerts using Jinja2 templates. Users can customize the templates (`email_html.j2` and `email_plain.j2`) to personalize email content for SSL and domain expiration notifications.
+- **Customizable Email Alerts with Jinja2 Templates**: Sends HTML and plain-text email alerts using Jinja2 templates. Users can customize the templates (`email_html.j2` and `email_plain.j2`) for SSL and domain expiration notifications.
 - **Comprehensive Error Handling**: 
-  - Uses custom error classes (`WebminAuthError`, `WebminServerError`, `WebminConnectionError`) to manage specific errors, helping to differentiate between authentication errors, server errors, and connection issues.
-  - Implements persistent error alerts that trigger email notifications when the same error occurs consecutively beyond a defined threshold (`ERROR_ALERT_THRESHOLD`). The interval between persistent alerts is configurable with the `ERROR_ALERT_INTERVAL` setting.
+  - Uses custom error classes (e.g., `WebminAuthError`, `WebminServerError`, `WebminConnectionError`) to manage specific errors, differentiating between authentication, server, and connection issues.
+  - Implements persistent error alerts that trigger email notifications when errors occur consecutively beyond a defined threshold (`ERROR_ALERT_THRESHOLD`).
 - **Enhanced Logging**: 
-  - Logs all events, including SSL and domain checks, additions, removals, and errors encountered during execution. 
+  - Logs all events, including SSL and domain checks, additions, removals, and errors encountered during execution.
   - Log entries are stored in a rotating log file (`webmin_domains.log`), which helps manage log size and maintain historical records.
-- **Retry Mechanism for API Calls**: The script includes a retry mechanism that handles temporary network failures. It automatically retries failed API calls up to a specified number of attempts (`MAX_RETRIES`) with an exponentially increasing wait time (`RETRY_WAIT`).
-- **Parallel Processing with Dynamic Worker Allocation**: Optimizes concurrent processing of API calls by determining the number of workers dynamically based on available CPU cores, reducing execution time.
+- **Retry Mechanism for API Calls**: Includes a retry mechanism that handles temporary network failures, automatically retrying failed API calls up to a specified number of attempts (`MAX_RETRIES`), with exponentially increasing wait times.
+- **Parallel Processing with Dynamic Worker Allocation**: Optimizes concurrent processing of API calls by dynamically determining the number of workers based on available CPU cores, reducing execution time.
 - **Configurable**: 
   - Easily configure Webmin server URLs, API credentials, alert thresholds, retry attempts, and more through the `.env` file.
-  - Allows customization of alert thresholds for SSL and domain expiration to tailor the notification schedule based on specific needs.
+  - New feature: Automatic batch size calculation based on API rate limits and processing time.
+  - Allows customization of alert thresholds for SSL and domain expiration to tailor the notification schedule.
 - **Continuous Execution Option**: 
-  - Provides the option to switch between single-run and continuous loop modes. In continuous loop mode, the script runs indefinitely, checking domain and SSL expiration at regular intervals (`CHECK_INTERVAL`).
-  - To enable continuous mode, uncomment the `continuous_loop()` function call and comment out the `main()` function call in the script.
+  - Provides the option to switch between single-run and continuous loop modes. 
+  - In continuous loop mode, the script runs indefinitely, checking domain and SSL expiration at regular intervals (`CHECK_INTERVAL`).
   - Can be integrated with systemd for automatic startup or set up as a cron job for scheduled execution in single-run mode.
-- **Systemd Service Integration**: Can be configured as a systemd service for continuous monitoring, with automatic restart capabilities and service management through systemd commands.
+- **Systemd Service Integration**: Configurable as a systemd service for continuous monitoring, with automatic restart capabilities and service management through systemd commands.
 - **Cron Job Setup**: Can be run periodically in single-run mode using a cron job, allowing for scheduled execution at specific times.
 
 ## Why Use This Script?
