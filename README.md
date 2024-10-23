@@ -154,7 +154,7 @@ This script now uses a **modular design**, with different modules handling confi
    - **Email settings**: Configure variables like `EMAIL_SENDER`, `EMAIL_RECIPIENT`, `SMTP_SERVER`, etc.
    - **Other settings**: Customize SSL alert days, domain expiration days, retry settings, etc., as needed.
 
-> **Note**: Ensure proper API access is configured in your Webmin control panel.
+> **Note**: Ensure proper API access is configured in your Webmin control panel. See [Setting up Webmin API](#setting-up-webmin-api) for instructions.
 
 ### Step 4: Verify Template Files
 
@@ -402,10 +402,6 @@ The email templates used for sending alerts are located in the `templates` direc
   - Use Jinja2 templates specified by `EMAIL_HTML_TEMPLATE` and `EMAIL_PLAIN_TEMPLATE` to customize alerts.
 - **Support and Logo URLs**:
   - Add URLs for support and logo to enhance the branding of email notifications.
-
-> **Important**: Ensure the `.env` file is secured and not exposed publicly, as it contains sensitive information like API keys and credentials.
-
-> **Note:** For instructions on setting up the script as a systemd service, please refer to [Step 8 in the Quick Start Guide](#quick-start-guide).
 
 ## Example Outputs
 
