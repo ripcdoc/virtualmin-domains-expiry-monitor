@@ -156,7 +156,7 @@ This script now uses a **modular design**, with different modules handling confi
 
 > **Note (Webmin API)**: Ensure proper API access is configured in your Webmin control panel. See [Setting up Webmin API](#setting-up-webmin-api) in the **Detailed Configuration Guide** section for instructions.
 
-> **Note (`.env` File)**: See [Setting up the Environment File](#setting-up-the-environment-file) in the **Detailed Configuration Guide** section for detailed explanation of `env` file and **all** variables.
+> **Note (`.env` File)**: See [Setting up the Environment File](#setting-up-the-environment-file) in the **Detailed Configuration Guide** section for detailed explanation of `.env` file and **all** variables.
 
 ### Step 4: Verify Template Files
 
@@ -278,7 +278,10 @@ Before running the script, ensure that the Webmin API is properly configured:
 
 4. **Firewall Settings**:
    - Allow incoming traffic on port 10000 (or the configured Webmin port).
-   - Add IP allowlists or rules to allow access only from trusted IPs.
+   - (Optional but **Strongly Suggested**) Add IP allowlists or rules to allow access only from trusted IPs.
+     > **Important:** Ensure the IP address of the **machine running the script** is allowed.
+     > 
+     > **Note:** For **Dynamic IP** addresses see [Create iptables Rules Based on Hostname Using an IPSet](https://www.putorius.net/ipset-iptables-rules-for-hostname.html) for an example of how to do this using the iptables firewall on Linux.
 
 5. **Verify API Endpoint and Keys**:
    - The endpoint format should be: `https://<webmin-server>/virtual-server/remote.cgi`.
@@ -287,7 +290,7 @@ Before running the script, ensure that the Webmin API is properly configured:
 ### Setting Up the Environment File
 
 > **Important:** Ensure the `.env` file is secured and not exposed publicly, as it contains sensitive information like API keys and credentials.
-> 
+
 > **Important:** Ensure that the `.env` file contains all the required variables. Below is the complete list of environment variables:
 
 ```env
