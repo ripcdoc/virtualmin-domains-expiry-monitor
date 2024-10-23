@@ -1,24 +1,11 @@
 # Webmin Domain and SSL Expiry Monitoring Script with Jinja2 Templated Alerts & Comprehensive Error Handling
 
-![Webmin Monitor Logo](expiry-monitor-logo.webp)
-
-___
-![This Release](https://badgen.net/github/release/ripcdoc/virtualmin-domains-expiry-monitor)
-![Latest Stable Release](https://badgen.net/github/release/ripcdoc/virtualmin-domains-expiry-monitor/stable)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/ripcdoc/virtualmin-domains-expiry-monitor/total)
-
-
-![Python](https://img.shields.io/badge/Python-3.11%20Recommended-blue)
-![Python](https://img.shields.io/badge/Python-3.8%2B%20Required-blue) 
-
-
-![License](https://img.shields.io/github/license/ripcdoc/virtualmin-domains-expiry-monitor)
-
-
-![Last Commit](https://img.shields.io/github/last-commit/ripcdoc/virtualmin-domains-expiry-monitor)
-![GitHub Issues](https://img.shields.io/github/issues/ripcdoc/virtualmin-domains-expiry-monitor)
-![Discord](https://img.shields.io/discord/1086056326083379211)
-___
+|![Webmin Monitor Logo](expiry-monitor-logo.webp)|
+|:---:|
+|![GitHub Release](https://img.shields.io/github/v/release/ripcdoc/virtualmin-domains-expiry-monitor?include_prereleases&label=This%20Release) ![GitHub Release](https://img.shields.io/github/v/release/ripcdoc/virtualmin-domains-expiry-monitor?label=Latest%20Stable%20Release) ![License](https://img.shields.io/github/license/ripcdoc/virtualmin-domains-expiry-monitor)|
+|![Last Commit](https://img.shields.io/github/last-commit/ripcdoc/virtualmin-domains-expiry-monitor) ![GitHub Issues](https://img.shields.io/github/issues/ripcdoc/virtualmin-domains-expiry-monitor)|
+|![Python](https://img.shields.io/badge/Python-3.11%20Recommended-blue) ![Python](https://img.shields.io/badge/Python-3.8%2B%20Required-blue)|
+|![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/ripcdoc/virtualmin-domains-expiry-monitor/total) ![GitHub repo file or directory count](https://img.shields.io/github/directory-file-count/ripcdoc/virtualmin-domains-expiry-monitor) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/ripcdoc/virtualmin-domains-expiry-monitor)![GitHub repo size](https://img.shields.io/github/repo-size/ripcdoc/virtualmin-domains-expiry-monitor)|
 
 ## Table of Contents
 - [Introduction](#introduction)
