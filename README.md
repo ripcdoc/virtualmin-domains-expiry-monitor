@@ -2,15 +2,23 @@
 
 ![Webmin Monitor Logo](expiry-monitor-logo.webp)
 
-![Last Commit](https://img.shields.io/github/last-commit/ripcdoc/virtualmin-domains-expiry-monitor)
-![Latest Release](https://img.shields.io/github/v/release/ripcdoc/virtualmin-domains-expiry-monitor?include_prereleases&sort=semver&display_name=tag)
-![GitHub Issues](https://img.shields.io/github/issues/ripcdoc/virtualmin-domains-expiry-monitor)
+___
+![This Release](https://badgen.net/github/release/ripcdoc/virtualmin-domains-expiry-monitor)
+![Latest Stable Release](https://badgen.net/github/release/ripcdoc/virtualmin-domains-expiry-monitor/stable)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/ripcdoc/virtualmin-domains-expiry-monitor/total)
+
+
+![Python](https://img.shields.io/badge/Python-3.11%20Recommended-blue)
+![Python](https://img.shields.io/badge/Python-3.8%2B%20Required-blue) 
+
+
 ![License](https://img.shields.io/github/license/ripcdoc/virtualmin-domains-expiry-monitor)
-# 
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 
 
-
+![Last Commit](https://img.shields.io/github/last-commit/ripcdoc/virtualmin-domains-expiry-monitor)
+![GitHub Issues](https://img.shields.io/github/issues/ripcdoc/virtualmin-domains-expiry-monitor)
+![Discord](https://img.shields.io/discord/1086056326083379211)
+___
 
 ## Table of Contents
 - [Introduction](#introduction)
