@@ -154,7 +154,9 @@ This script now uses a **modular design**, with different modules handling confi
    - **Email settings**: Configure variables like `EMAIL_SENDER`, `EMAIL_RECIPIENT`, `SMTP_SERVER`, etc.
    - **Other settings**: Customize SSL alert days, domain expiration days, retry settings, etc., as needed.
 
-> **Note**: Ensure proper API access is configured in your Webmin control panel. See [Setting up Webmin API](#setting-up-webmin-api) for instructions.
+> **Note (Webmin API)**: Ensure proper API access is configured in your Webmin control panel. See [Setting up Webmin API](#setting-up-webmin-api) in the **Detailed Configuration Guide** section for instructions.
+
+> **Note (`.env` File)**: See [Setting up the Environment File](#setting-up-the-environment-file) in the **Detailed Configuration Guide** section for detailed explanation of `env` file and **all** variables.
 
 ### Step 4: Verify Template Files
 
