@@ -136,7 +136,7 @@ This script now uses a **modular design**, with different modules handling confi
 
 ### Step 2: Install Python Dependencies
 
-1. Ensure you have Python 3.8 or higher installed.
+1. Ensure you have Python 3.8 or higher installed (3.11 recommended).
 2. Install the required packages from the `requirements.txt` file:
    ```bash
    python -m pip install -r requirements.txt
