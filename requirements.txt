@@ -1,16 +1,13 @@
 # Core Dependencies
-requests==2.32.2         # For making HTTP requests to Webmin API
-python-dotenv==1.0.0     # For loading environment variables from .env file
-jinja2==3.1.4            # For rendering email templates
-gevent==23.9.0           # For handling concurrency
+requests>=2.32.2         # For making HTTP requests to Webmin API
+python-dotenv>=1.0.0     # For loading environment variables from .env file
+jinja2>=3.1.4            # For rendering email templates
+gevent>=23.9.0           # For handling concurrency
 
 # Development and Testing Tools
-flake8==6.1.0            # For static code analysis
-pylint==3.0.0            # For linting Python code
-tox==4.8.0               # For multi-version testing
-pytest==7.4.0            # For running unit tests
-coverage==7.3.1          # For measuring test coverage
-codecov==3.1.0           # For uploading coverage reports to Codecov
-
-# To install dependencies, use:
-# python -m pip install -r requirements.txt
+flake8>=6.1.0            # For static code analysis
+pylint>=3.0.0            # For linting Python code
+tox>=4.8.0               # For multi-version testing
+pytest>=7.4.0            # For running unit tests
+coverage>=7.3.1          # For measuring test coverage
+codecov>=3.1.0           # For uploading coverage reports to Codecov
