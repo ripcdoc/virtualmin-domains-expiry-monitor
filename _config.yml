@@ -1,0 +1,48 @@
+# Config for GitHub Pages
+
+title: Virtualmin Domains Expiry Monitor
+description: A tool for monitoring domain expiry on Virtualmin using Python. This site serves as the documentation and user guide for the tool.
+
+# Set up base URL
+baseurl: "/virtualmin-domains-expiry-monitor"  # Adjust based on your repository name
+
+# Set the URL of your site
+url: "https://ripcdoc.github.io"
+
+# Theme settings
+theme: jekyll-theme-cayman  # Default theme; adjust as needed
+plugins:
+  - jekyll-feed             # To add RSS feed support
+  - jekyll-seo-tag          # For better SEO
+  - jekyll-sitemap          # To generate a sitemap
+
+# Exclude files and folders that shouldn't be part of the site
+exclude:
+  - .gitignore
+  - LICENSE
+  - README.md
+  - requirements.txt
+  - env.sample
+  - tox.ini
+  - .github
+  - tests
+  - templates
+  - images
+
+# Markdown settings
+markdown: kramdown
+highlighter: rouge
+
+# Social links (optional)
+social_links:
+  - name: GitHub
+    url: "https://github.com/ripcdoc/virtualmin-domains-expiry-monitor"
+    icon: "fab fa-github"
+
+# Navigation settings
+nav_order: 1
+has_children: true
+
+# Footer settings
+footer:
+  copyright: "© 2024 Dr. Peter O'Hara-Diaz"
