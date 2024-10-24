@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']  # Add multi-version support
+        python-version: ['3.9', '3.10', '3.11']  # Add multi-version support
     steps:
       - name: Check out the code
         uses: actions/checkout@v3
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']  # Add multi-version support
+        python-version: ['3.9', '3.10', '3.11']  # Add multi-version support
     steps:
       - name: Check out the code
         uses: actions/checkout@v3
