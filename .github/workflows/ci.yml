@@ -20,14 +20,11 @@ jobs:
     steps:
       - name: Check out the code
         uses: actions/checkout@v3
-        with:
-          node-version: '20'  # Explicitly use Node.js 20
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          node-version: '20'  # Explicitly use Node.js 20
 
       - name: Install dependencies
         run: |
